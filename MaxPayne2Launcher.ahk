@@ -1,6 +1,10 @@
 #Requires AutoHotkey v2
 #SingleInstance Force
 
+; TODO
+; add more options (see https://steamcommunity.com/sharedfiles/filedetails/?id=2022465230)
+; split resolution into width and height to limit user errors
+
 ; Do not edit these
 g_sConfigFile := A_ScriptDir "\MaxPayne2Launcher.ini"
 g_sGameExe := "MaxPayne2.exe"
@@ -95,7 +99,7 @@ CheckMod()
 		g_sModName := "<none selected>"
 	else if (g_sModName && g_sModName != "<none selected>" && !FileExist(g_sModName ".mp2m"))
 	{
-		OutputDebug("Mod not found: " g_sGameDir g_sModName ".mp2m`n")
+		MsgBox("Mod not found:`n`n" g_sGameDir g_sModName ".mp2m", "Warning", 48)
 		g_sModName := "<none selected>"
 	}
 }
