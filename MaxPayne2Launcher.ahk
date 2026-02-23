@@ -54,7 +54,7 @@ CreateGUI()
 
 	try
 	{
-		g_cbUnlockAllChapters.Value .= RegRead(g_sGameRegKey "Game Level", "LevelSelector", 0)
+		g_cbUnlockAllChapters.Value := RegRead(g_sGameRegKey "Game Level", "LevelSelector", 0)
 		g_cbUnlockAllDiff.Value := RegRead(g_sGameRegKey "Game Level", "hell", 0) &&
 		                           RegRead(g_sGameRegKey "Game Level", "nightmare", 0) &&
 		                           RegRead(g_sGameRegKey "Game Level", "timedmode", 0)
@@ -62,17 +62,17 @@ CreateGUI()
 
 	g_gui.AddGroupBox("R12 x12 w225", "Launch parameters")
 	g_gui.AddLink("x20 y130", 'See this <a href="https://www.pcgamingwiki.com/wiki/Max_Payne_2:_The_Fall_of_Max_Payne#Command_line_arguments">link</a> for more details.')
-	g_cbDeveloper := g_gui.AddCheckbox("x20 y155", "-developer")
-	g_cbDeveloperKeys := g_gui.AddCheckbox("x20 y180", "-developerkeys")
+	g_cbDeveloper := g_gui.AddCheckbox(        "x20 y155", "-developer")
+	g_cbDeveloperKeys := g_gui.AddCheckbox(    "x20 y180", "-developerkeys")
 	g_cbDisable3dpreloads := g_gui.AddCheckbox("x20 y205", "-disable3dpreloads")
-	g_cbNodialog := g_gui.AddCheckbox("x20 y230", "-nodialog")
-	g_cbNovidmemcheck := g_gui.AddCheckbox("x20 y255", "-novidmemcheck")
-	g_cbProfile := g_gui.AddCheckbox("x20 y280", "-profile")
-	g_cbScreenshot := g_gui.AddCheckbox("x20 y305", "-screenshot")
-	g_cbShowprogress:= g_gui.AddCheckbox("x20 y330", "-showprogress")
-	g_cbShowprogress.OnEvent("Click", (*) => g_cbDeveloper.Value := true)
-	g_cbSkipstartup := g_gui.AddCheckbox("x20 y355", "-skipstartup")
-	g_cbWindow := g_gui.AddCheckbox("x20 y380", "-window")
+	g_cbNodialog := g_gui.AddCheckbox(         "x20 y230", "-nodialog")
+	g_cbNovidmemcheck := g_gui.AddCheckbox(    "x20 y255", "-novidmemcheck")
+	g_cbProfile := g_gui.AddCheckbox(          "x20 y280", "-profile")
+	g_cbScreenshot := g_gui.AddCheckbox(       "x20 y305", "-screenshot")
+	g_cbShowprogress:= g_gui.AddCheckbox(      "x20 y330", "-showprogress")
+	g_cbSkipstartup := g_gui.AddCheckbox(      "x20 y355", "-skipstartup")
+	g_cbWindow := g_gui.AddCheckbox(           "x20 y380", "-window")
+	g_cbShowprogress.OnEvent("Click", GuiCB_Click)
 
 	g_gui.AddGroupBox("R2.3 x12 w225", "Extra")
 	g_cbUnlockAllChapters := g_gui.AddCheckbox("x20 y435", "Unlock all chapters")
@@ -157,6 +157,9 @@ GuiCB_Click(GuiCtrlObj, Info)
 			g_bUnlockAllChapters := g_cbUnlockAllChapters.Value
 		case g_cbUnlockAllDiff:
 			g_bUnlockAllDiff := g_cbUnlockAllDiff.Value
+		case g_cbShowprogress:
+			if (g_cbShowprogress.Value)
+				g_cbDeveloper.Value := true
 	}
 }
 
@@ -174,37 +177,49 @@ GuiStartButton_Click(*)
 	if (!g_bNoGUI)
 		g_gui.Hide()
 
+	; If the launcher is already running, activate it
 	if (WinExist(g_sWinTitle))
 		WinActivate(g_sWinTitle)
+	; Otherwise run it
 	else
 	{
-		local l_sLaunchArgs := ""
-		
+		; Create launch arguments
 		if (g_bNoGUI)
 		{
-			l_sLaunchArgs .= g_bDeveloper ? "-developer" : ""
-			l_sLaunchArgs .= " " (g_bDeveloperKeys ? "-developerkeys" : "")
-			l_sLaunchArgs .= " " (g_bDisable3dpreloads ? "-disable3dpreloads" : "")
-			l_sLaunchArgs .= " " (g_bNodialog ? "-nodialog" : "")
-			l_sLaunchArgs .= " " (g_bNovidmemcheck ? "-novidmemcheck" : "")
-			l_sLaunchArgs .= " " (g_bProfile ? "-profile" : "")
-			l_sLaunchArgs .= " " (g_bScreenshot ? "-screenshot" : "")
-			l_sLaunchArgs .= " " (g_bShowprogress ? "-showprogress" : "")
-			l_sLaunchArgs .= " " (g_bSkipstartup ? "-skipstartup" : "")
-			l_sLaunchArgs .= " " (g_bWindow ? "-window" : "")
+			local l_mapArgs := Map(
+				"-developer",         g_bDeveloper,
+				"-developerkeys",     g_bDeveloperKeys,
+				"-disable3dpreloads", g_bDisable3dpreloads,
+				"-nodialog",          g_bNodialog,
+				"-novidmemcheck",     g_bNovidmemcheck,
+				"-profile",           g_bProfile,
+				"-screenshot",        g_bScreenshot,
+				"-showprogress",      g_bShowprogress,
+				"-skipstartup",       g_bSkipstartup,
+				"-window",            g_bWindow
+			)
 		}
 		else
 		{
-			l_sLaunchArgs .= g_cbDeveloper.Value ? g_cbDeveloper.Text : ""
-			l_sLaunchArgs .= " " (g_cbDeveloperKeys.Value ? g_cbDeveloperKeys.Text : "")
-			l_sLaunchArgs .= " " (g_cbDisable3dpreloads.Value ? g_cbDisable3dpreloads.Text : "")
-			l_sLaunchArgs .= " " (g_cbNodialog.Value ? g_cbNodialog.Text : "")
-			l_sLaunchArgs .= " " (g_cbNovidmemcheck.Value ? g_cbNovidmemcheck.Text : "")
-			l_sLaunchArgs .= " " (g_cbProfile.Value ? g_cbProfile.Text : "")
-			l_sLaunchArgs .= " " (g_cbScreenshot.Value ? g_cbScreenshot.Text : "")
-			l_sLaunchArgs .= " " (g_cbShowprogress.Value ? g_cbShowprogress.Text : "")
-			l_sLaunchArgs .= " " (g_cbSkipstartup.Value ? g_cbSkipstartup.Text : "")
-			l_sLaunchArgs .= " " (g_cbWindow.Value ? g_cbWindow.Text : "")
+			local l_mapArgs := Map(
+				"-developer",         g_cbDeveloper.Value,
+				"-developerkeys",     g_cbDeveloperKeys.Value,
+				"-disable3dpreloads", g_cbDisable3dpreloads.Value,
+				"-nodialog",          g_cbNodialog.Value,
+				"-novidmemcheck",     g_cbNovidmemcheck.Value,
+				"-profile",           g_cbProfile.Value,
+				"-screenshot",        g_cbScreenshot.Value,
+				"-showprogress",      g_cbShowprogress.Value,
+				"-skipstartup",       g_cbSkipstartup.Value,
+				"-window",            g_cbWindow.Value
+			)
+		}
+
+		local l_sLaunchArgs := ""
+		for l_sKey, l_sValue in l_mapArgs
+		{
+			if (l_sValue)
+				l_sLaunchArgs .= l_sLaunchArgs ? " " l_sKey : l_sKey
 		}
 
 		Run(g_sGameExe " " l_sLaunchArgs)
@@ -228,24 +243,24 @@ ReadConfigFile()
 
 	try
 	{
-		g_sGameDir := IniRead(g_sConfigFile, "General", "sGameDir", "C:\Program Files\Steam\steamapps\common\Max Payne 2\")
-		g_nWidth := IniRead(g_sConfigFile, "General", "nWidth", 2560)
-		g_nHeight := IniRead(g_sConfigFile, "General", "nHeight", 1440)
-		g_sResolution := g_nWidth " x " g_nHeight " x 32"
-		g_sModName := IniRead(g_sConfigFile, "General", "sModName", "")
-		g_bUnlockAllDiff := IniRead(g_sConfigFile, "General", "bUnlockAllDiff", 0)
-		g_bUnlockAllChapters := IniRead(g_sConfigFile, "bUnlockAllChapters", "sGameDir", 0)
-		g_bDeveloper := IniRead(g_sConfigFile, "General", "bDeveloper", 0)
-		g_bDeveloperKeys := IniRead(g_sConfigFile, "General", "bDeveloperKeys", 0)
+		g_sGameDir := IniRead(g_sConfigFile,           "General", "sGameDir", "C:\Program Files\Steam\steamapps\common\Max Payne 2\")
+		g_nWidth := IniRead(g_sConfigFile,             "General", "nWidth", 2560)
+		g_nHeight := IniRead(g_sConfigFile,            "General", "nHeight", 1440)
+		g_sModName := IniRead(g_sConfigFile,           "General", "sModName", "")
+		g_bUnlockAllChapters := IniRead(g_sConfigFile, "General", "bUnlockAllChapters", 0)
+		g_bUnlockAllDiff := IniRead(g_sConfigFile,     "General", "bUnlockAllDiff", 0)
+		g_bDeveloper := IniRead(g_sConfigFile,         "General", "bDeveloper", 0)
+		g_bDeveloperKeys := IniRead(g_sConfigFile,     "General", "bDeveloperKeys", 0)
 		g_bDisable3dpreloads := IniRead(g_sConfigFile, "General", "bDisable3dpreloads", 0)
-		g_bNodialog := IniRead(g_sConfigFile, "General", "bNodialog", 0)
-		g_bNovidmemcheck := IniRead(g_sConfigFile, "General", "bNovidmemcheck", 0)
-		g_bProfile := IniRead(g_sConfigFile, "General", "bProfile", 0)
-		g_bScreenshot := IniRead(g_sConfigFile, "General", "bScreenshot", 0)
-		g_bShowprogress := IniRead(g_sConfigFile, "General", "bShowprogress", 0)
-		g_bSkipstartup := IniRead(g_sConfigFile, "General", "bSkipstartup", 0)
-		g_bWindow := IniRead(g_sConfigFile, "General", "bWindow", 0)
-		g_bNoGUI := IniRead(g_sConfigFile, "General", "bNoGUI", 0)
+		g_bNodialog := IniRead(g_sConfigFile,          "General", "bNodialog", 0)
+		g_bNovidmemcheck := IniRead(g_sConfigFile,     "General", "bNovidmemcheck", 0)
+		g_bProfile := IniRead(g_sConfigFile,           "General", "bProfile", 0)
+		g_bScreenshot := IniRead(g_sConfigFile,        "General", "bScreenshot", 0)
+		g_bShowprogress := IniRead(g_sConfigFile,      "General", "bShowprogress", 0)
+		g_bSkipstartup := IniRead(g_sConfigFile,       "General", "bSkipstartup", 0)
+		g_bWindow := IniRead(g_sConfigFile,            "General", "bWindow", 0)
+		g_bNoGUI := IniRead(g_sConfigFile,             "General", "bNoGUI", 0)
+		g_sResolution := g_nWidth " x " g_nHeight " x 32"
 	}
 }
 
@@ -265,21 +280,21 @@ SaveSettings()
 
 		if (!g_bNoGUI)
 		{
-			IniWrite(g_udWidth.Value, g_sConfigFile, "General", "nWidth")
-			IniWrite(g_udHeight.Value, g_sConfigFile, "General", "nHeight")
-			IniWrite('"' g_sModName '"', g_sConfigFile, "General", "sModName")
-			IniWrite(g_cbUnlockAllDiff.Value, g_sConfigFile, "General", "bUnlockAllDiff")
+			IniWrite(g_udWidth.Value, g_sConfigFile,             "General", "nWidth")
+			IniWrite(g_udHeight.Value, g_sConfigFile,            "General", "nHeight")
+			IniWrite('"' g_sModName '"', g_sConfigFile,          "General", "sModName")
 			IniWrite(g_cbUnlockAllChapters.Value, g_sConfigFile, "General", "bUnlockAllChapters")
-			IniWrite(g_cbDeveloper.Value, g_sConfigFile, "General", "bDeveloper")
-			IniWrite(g_cbDeveloperKeys.Value, g_sConfigFile, "General", "bDeveloperKeys")
+			IniWrite(g_cbUnlockAllDiff.Value, g_sConfigFile,     "General", "bUnlockAllDiff")
+			IniWrite(g_cbDeveloper.Value, g_sConfigFile,         "General", "bDeveloper")
+			IniWrite(g_cbDeveloperKeys.Value, g_sConfigFile,     "General", "bDeveloperKeys")
 			IniWrite(g_cbDisable3dpreloads.Value, g_sConfigFile, "General", "bDisable3dpreloads")
-			IniWrite(g_cbNodialog.Value, g_sConfigFile, "General", "bNodialog")
-			IniWrite(g_cbNovidmemcheck.Value, g_sConfigFile, "General", "bNovidmemcheck")
-			IniWrite(g_cbProfile.Value, g_sConfigFile, "General", "bProfile")
-			IniWrite(g_cbScreenshot.Value, g_sConfigFile, "General", "bScreenshot")
-			IniWrite(g_cbShowprogress.Value, g_sConfigFile, "General", "bShowprogress")
-			IniWrite(g_cbSkipstartup.Value, g_sConfigFile, "General", "bSkipstartup")
-			IniWrite(g_cbWindow.Value, g_sConfigFile, "General", "bWindow")
+			IniWrite(g_cbNodialog.Value, g_sConfigFile,          "General", "bNodialog")
+			IniWrite(g_cbNovidmemcheck.Value, g_sConfigFile,     "General", "bNovidmemcheck")
+			IniWrite(g_cbProfile.Value, g_sConfigFile,           "General", "bProfile")
+			IniWrite(g_cbScreenshot.Value, g_sConfigFile,        "General", "bScreenshot")
+			IniWrite(g_cbShowprogress.Value, g_sConfigFile,      "General", "bShowprogress")
+			IniWrite(g_cbSkipstartup.Value, g_sConfigFile,       "General", "bSkipstartup")
+			IniWrite(g_cbWindow.Value, g_sConfigFile,            "General", "bWindow")
 		}
 	}
 	catch as e
