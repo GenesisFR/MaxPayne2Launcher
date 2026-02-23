@@ -75,15 +75,16 @@ CreateGUI()
 	global
 
 	g_gui := Gui("-MinimizeBox -MaximizeBox", "Max Payne 2 Launcher")
-	g_gui.SetFont("s10")
+	g_gui.BackColor := "353434"
+	g_gui.SetFont("CWhite s10")
 
 	; Resolution
 	g_gui.AddGroupBox("R3 w225", "Resolution")
 	g_gui.AddText("Right x15 y35 w50", "Width")
-	g_gui.AddEdit("Number R1 x70 y30 w150")
+	g_gui.AddEdit("CBlack Number R1 x70 y30 w150")
 	g_udWidth := g_gui.AddUpDown("Range640-10000 0x80", g_nWidth)
 	g_gui.AddText("Right x15 y65 w50", "Height")
-	g_gui.AddEdit("Number R1 x70 y60 w150")
+	g_gui.AddEdit("CBlack Number R1 x70 y60 w150")
 	g_udHeight := g_gui.AddUpDown("Range480-10000 0x80", g_nHeight)
 
 	try
@@ -128,7 +129,7 @@ CreateGUI()
 		g_sModName := g_ddlModName.Text
 	}
 
-	g_gui.AddButton("Default x85", "&Start game").OnEvent("Click", GuiStartButton_Click)
+	g_gui.AddButton("Background353434 Default x85", "&Start game").OnEvent("Click", GuiStartButton_Click)
 }
 
 CheckMods()
