@@ -46,8 +46,14 @@ CreateGUI()
 
 	g_gui := Gui("-MinimizeBox -MaximizeBox", "Max Payne 2 Launcher")
 	g_gui.SetFont("s10")
-	g_gui.AddText(, "Resolution")
-	g_editResolution := g_gui.AddEdit("r1 x90 y5 w150", g_nResolution)
+
+	; Resolution
+	g_gui.AddText("Right x10 y10 w50", "Width")
+	g_gui.AddEdit("Number r1 x70 y5 w150")
+	g_udWidth := g_gui.AddUpDown("Range640-10000 0x80", g_nWidth)
+	g_gui.AddText("Right x10 y35 w50", "Height")
+	g_gui.AddEdit("Number r1 x70 y30 w150")
+	g_udHeight := g_gui.AddUpDown("Range480-10000 0x80", g_nHeight)
 
 	; Retrieve all mod names from the game directory
 	g_arrModFiles := ["<none selected>"]
@@ -60,8 +66,8 @@ CreateGUI()
 	; Only display the mod DDL if mods were found
 	if (g_arrModFiles.Length > 1)
 	{
-		g_gui.AddText("x50", "Mod")
-		g_ddlModName := g_gui.AddDropDownList("Choose1 x90 y33", g_arrModFiles)
+		g_gui.AddText("Right x10 y60 w50", "Mod")
+		g_ddlModName := g_gui.AddDropDownList("Choose1 x70 y55", g_arrModFiles)
 		g_ddlModName.OnEvent("Change", GuiDDLMod_Change)
 
 		if (g_sModName)
@@ -113,13 +119,18 @@ GetResolutionFromRegistry()
 	{
 		try
 		{
-			g_nResolution := RegRead(g_sGameRegKey "Video Settings", "Display Width", "") " x "
-			g_nResolution .= RegRead(g_sGameRegKey "Video Settings", "Display Height", "") " x 32"
+			g_nWidth := RegRead(g_sGameRegKey "Video Settings", "Display Width", "")
+			g_nHeight := RegRead(g_sGameRegKey "Video Settings", "Display Height", "")
 		}
 
 		; Still not found, force 1440p
-		if (!g_nResolution)
-			g_nResolution := "2560 x 1440 x 32"
+		if (!g_sResolution)
+		{
+			g_nWidth := 2560
+			g_nHeight := 1440
+		}
+
+		g_sResolution := g_nWidth " x " g_nHeight " x 32"
 	}
 }
 
@@ -160,7 +171,7 @@ GuiStartButton_Click(*)
 
 	; Send the right keystrokes to the game launcher window
 	ControlSend("{Down}", "ComboBox1", g_sWinTitle) ; ComboBox1 = Display Adapter DDL
-	ControlChooseString(g_nResolution, "ComboBox2", g_sWinTitle) ; ComboBox2 = Screen Mode DDL
+	ControlChooseString(g_sResolution, "ComboBox2", g_sWinTitle) ; ComboBox2 = Screen Mode DDL
 	ControlChooseString(g_sModName, "ComboBox4", g_sWinTitle) ; ComboBox4 = Choose Customized Game DDL
 	ControlSend("{Enter}", "Button1", g_sWinTitle) ; Button1 = Play button
 }
@@ -172,9 +183,9 @@ ReadConfigFile()
 	try
 	{
 		g_sGameDir := IniRead(g_sConfigFile, "General", "sGameDir", "C:\Program Files\Steam\steamapps\common\Max Payne 2\")
-		local l_nWidth := IniRead(g_sConfigFile, "General", "nWidth", 2560)
-		local l_nHeight := IniRead(g_sConfigFile, "General", "nHeight", 1440)
-		g_nResolution := l_nWidth " x " l_nHeight " x 32"
+		g_nWidth := IniRead(g_sConfigFile, "General", "nWidth", 2560)
+		g_nHeight := IniRead(g_sConfigFile, "General", "nHeight", 1440)
+		g_sResolution := g_nWidth " x " g_nHeight " x 32"
 		g_sModName := IniRead(g_sConfigFile, "General", "sModName", "")
 		g_bUnlockAllDiff := IniRead(g_sConfigFile, "General", "bUnlockAllDiff", 1)
 		g_bUnlockAllChapters := IniRead(g_sConfigFile, "bUnlockAllChapters", "sGameDir", 1)
@@ -193,14 +204,8 @@ WriteSettingsToRegistryAndConfig()
 
 		if (!g_bNoGUI)
 		{
-			local l_arrResolutionParts := StrSplit(g_nResolution, " x ")
-
-			if (!g_bNoGUI && l_arrResolutionParts.Length > 1)
-			{
-				IniWrite(l_arrResolutionParts[1], g_sConfigFile, "General", "nWidth")
-				IniWrite(l_arrResolutionParts[2], g_sConfigFile, "General", "nHeight")
-			}
-
+			IniWrite(g_udWidth.Value, g_sConfigFile, "General", "nWidth")
+			IniWrite(g_udHeight.Value, g_sConfigFile, "General", "nHeight")
 			IniWrite("`"" g_sModName "`"", g_sConfigFile, "General", "sModName")
 			IniWrite(g_cbUnlockAllDiff.Value, g_sConfigFile, "General", "bUnlockAllDiff")
 			IniWrite(g_cbUnlockAllChapters.Value, g_sConfigFile, "General", "bUnlockAllChapters")
