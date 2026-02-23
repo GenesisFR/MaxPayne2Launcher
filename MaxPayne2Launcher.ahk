@@ -169,7 +169,7 @@ GuiStartButton_Click(*)
 {
 	global
 
-	WriteSettingsToRegistryAndConfig()
+	SaveSettings()
 
 	if (!g_bNoGUI)
 		g_gui.Hide()
@@ -249,20 +249,25 @@ ReadConfigFile()
 	}
 }
 
-WriteSettingsToRegistryAndConfig()
+SaveSettings()
 {
 	try
 	{
-		RegWrite(g_bUnlockAllChapters, "REG_DWORD", g_sGameRegKey "Game Level", "LevelSelector")
-		RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "hell")
-		RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "nightmare")
-		RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "timedmode")
+		if (g_bUnlockAllChapters)
+			RegWrite(g_bUnlockAllChapters, "REG_DWORD", g_sGameRegKey "Game Level", "LevelSelector")
+
+		if (g_bUnlockAllDiff)
+		{
+			RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "hell")
+			RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "nightmare")
+			RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "timedmode")
+		}
 
 		if (!g_bNoGUI)
 		{
 			IniWrite(g_udWidth.Value, g_sConfigFile, "General", "nWidth")
 			IniWrite(g_udHeight.Value, g_sConfigFile, "General", "nHeight")
-			IniWrite("`"" g_sModName "`"", g_sConfigFile, "General", "sModName")
+			IniWrite('"' g_sModName '"', g_sConfigFile, "General", "sModName")
 			IniWrite(g_cbUnlockAllDiff.Value, g_sConfigFile, "General", "bUnlockAllDiff")
 			IniWrite(g_cbUnlockAllChapters.Value, g_sConfigFile, "General", "bUnlockAllChapters")
 			IniWrite(g_cbDeveloper.Value, g_sConfigFile, "General", "bDeveloper")
