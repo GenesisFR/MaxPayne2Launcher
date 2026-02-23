@@ -1,10 +1,6 @@
 #Requires AutoHotkey v2
 #SingleInstance Force
 
-; TODO
-; add more options (see https://steamcommunity.com/sharedfiles/filedetails/?id=2022465230)
-; split resolution into width and height to limit user errors
-
 ; Do not edit these
 g_sConfigFile := A_ScriptDir "\MaxPayne2Launcher.ini"
 g_sGameExe := "MaxPayne2.exe"
@@ -14,7 +10,7 @@ g_sWinTitle := "ahk_exe MaxPayne2.exe ahk_class #32770"
 ReadConfigFile()
 CheckGameExe()
 GetResolutionFromRegistry()
-CheckMod()
+CheckMods()
 
 if (g_bNoGUI)
 	GuiStartButton_Click()
@@ -55,13 +51,6 @@ CreateGUI()
 	g_gui.AddEdit("Number r1 x70 y30 w150")
 	g_udHeight := g_gui.AddUpDown("Range480-10000 0x80", g_nHeight)
 
-	; Retrieve all mod names from the game directory
-	g_arrModFiles := ["<none selected>"]
-	Loop Files, g_sGameDir "\*.mp2m"
-	{
-		SplitPath(A_LoopFileFullPath, , , , &l_sFileNameNoExt)
-		g_arrModFiles.Push(l_sFileNameNoExt)
-	}
 
 	; Only display the mod DDL if mods were found
 	if (g_arrModFiles.Length > 1)
@@ -89,10 +78,24 @@ CreateGUI()
 		                           RegRead(g_sGameRegKey "Game Level", "timedmode", 0)
 	}
 
+	g_gui.AddLink(, 'Launch parameters (see this <a href="https://www.pcgamingwiki.com/wiki/Max_Payne_2:_The_Fall_of_Max_Payne#Command_line_arguments">link</a> for details)')
+	g_cbDeveloper := g_gui.AddCheckbox("x10", "-developer")
+	g_cbDeveloperKeys := g_gui.AddCheckbox("x10", "-developerkeys")
+	g_cbDisable3dpreloads := g_gui.AddCheckbox("x10", "-disable3dpreloads")
+	g_cbNodialog := g_gui.AddCheckbox("x10", "-nodialog")
+	g_cbNodialog.OnEvent("Click", (*) => g_ddlModName.Enabled := !g_cbNodialog.Value)
+	g_cbNovidmemcheck := g_gui.AddCheckbox("x10", "-novidmemcheck")
+	g_cbProfile := g_gui.AddCheckbox("x10", "-profile")
+	g_cbScreenshot := g_gui.AddCheckbox("x10", "-screenshot")
+	g_cbShowprogress:= g_gui.AddCheckbox("x10", "-showprogress")
+	g_cbShowprogress.OnEvent("Click", (*) => g_cbDeveloper.Value := true)
+	g_cbSkipstartup := g_gui.AddCheckbox("x10", "-skipstartup")
+	g_cbWindow := g_gui.AddCheckbox("x10", "-window")
+
 	g_gui.AddButton("Default x85", "&Start game").OnEvent("Click", GuiStartButton_Click)
 }
 
-CheckMod()
+CheckMods()
 {
 	global
 
@@ -107,6 +110,14 @@ CheckMod()
 	{
 		MsgBox("Mod not found:`n`n" g_sGameDir g_sModName ".mp2m", "Warning", 48)
 		g_sModName := "<none selected>"
+	}
+
+	; Retrieve all mod names from the game directory
+	g_arrModFiles := ["<none selected>"]
+	Loop Files, g_sGameDir "\*.mp2m"
+	{
+		SplitPath(A_LoopFileFullPath, , , , &l_sFileNameNoExt)
+		g_arrModFiles.Push(l_sFileNameNoExt)
 	}
 }
 
@@ -154,6 +165,8 @@ GuiDDLMod_Change(*)
 
 GuiStartButton_Click(*)
 {
+	global
+
 	WriteSettingsToRegistryAndConfig()
 
 	if (!g_bNoGUI)
@@ -162,7 +175,38 @@ GuiStartButton_Click(*)
 	if (WinExist(g_sWinTitle))
 		WinActivate(g_sWinTitle)
 	else
-		Run(g_sGameExe)
+	{
+		local l_sLaunchArgs := ""
+		
+		if (g_bNoGUI)
+		{
+			l_sLaunchArgs .= g_bDeveloper ? "-developer" : ""
+			l_sLaunchArgs .= " " (g_bDeveloperKeys ? "-developerkeys" : "")
+			l_sLaunchArgs .= " " (g_bDisable3dpreloads ? "-disable3dpreloads" : "")
+			l_sLaunchArgs .= " " (g_bNodialog ? "-nodialog" : "")
+			l_sLaunchArgs .= " " (g_bNovidmemcheck ? "-novidmemcheck" : "")
+			l_sLaunchArgs .= " " (g_bProfile ? "-profile" : "")
+			l_sLaunchArgs .= " " (g_bScreenshot ? "-screenshot" : "")
+			l_sLaunchArgs .= " " (g_bShowprogress ? "-showprogress" : "")
+			l_sLaunchArgs .= " " (g_bSkipstartup ? "-skipstartup" : "")
+			l_sLaunchArgs .= " " (g_bWindow ? "-window" : "")
+		}
+		else
+		{
+			l_sLaunchArgs .= g_cbDeveloper.Value ? g_cbDeveloper.Text : ""
+			l_sLaunchArgs .= " " (g_cbDeveloperKeys.Value ? g_cbDeveloperKeys.Text : "")
+			l_sLaunchArgs .= " " (g_cbDisable3dpreloads.Value ? g_cbDisable3dpreloads.Text : "")
+			l_sLaunchArgs .= " " (g_cbNodialog.Value ? g_cbNodialog.Text : "")
+			l_sLaunchArgs .= " " (g_cbNovidmemcheck.Value ? g_cbNovidmemcheck.Text : "")
+			l_sLaunchArgs .= " " (g_cbProfile.Value ? g_cbProfile.Text : "")
+			l_sLaunchArgs .= " " (g_cbScreenshot.Value ? g_cbScreenshot.Text : "")
+			l_sLaunchArgs .= " " (g_cbShowprogress.Value ? g_cbShowprogress.Text : "")
+			l_sLaunchArgs .= " " (g_cbSkipstartup.Value ? g_cbSkipstartup.Text : "")
+			l_sLaunchArgs .= " " (g_cbWindow.Value ? g_cbWindow.Text : "")
+		}
+
+		Run(g_sGameExe " " l_sLaunchArgs)
+	}
 
 	; We give 15 seconds for the launcher to show up
 	; If the game launcher always hangs, you should consider using https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch
@@ -187,8 +231,18 @@ ReadConfigFile()
 		g_nHeight := IniRead(g_sConfigFile, "General", "nHeight", 1440)
 		g_sResolution := g_nWidth " x " g_nHeight " x 32"
 		g_sModName := IniRead(g_sConfigFile, "General", "sModName", "")
-		g_bUnlockAllDiff := IniRead(g_sConfigFile, "General", "bUnlockAllDiff", 1)
-		g_bUnlockAllChapters := IniRead(g_sConfigFile, "bUnlockAllChapters", "sGameDir", 1)
+		g_bUnlockAllDiff := IniRead(g_sConfigFile, "General", "bUnlockAllDiff", 0)
+		g_bUnlockAllChapters := IniRead(g_sConfigFile, "bUnlockAllChapters", "sGameDir", 0)
+		g_bDeveloper := IniRead(g_sConfigFile, "General", "bDeveloper", 0)
+		g_bDeveloperKeys := IniRead(g_sConfigFile, "General", "bDeveloperKeys", 0)
+		g_bDisable3dpreloads := IniRead(g_sConfigFile, "General", "bDisable3dpreloads", 0)
+		g_bNodialog := IniRead(g_sConfigFile, "General", "bNodialog", 0)
+		g_bNovidmemcheck := IniRead(g_sConfigFile, "General", "bNovidmemcheck", 0)
+		g_bProfile := IniRead(g_sConfigFile, "General", "bProfile", 0)
+		g_bScreenshot := IniRead(g_sConfigFile, "General", "bScreenshot", 0)
+		g_bShowprogress := IniRead(g_sConfigFile, "General", "bShowprogress", 0)
+		g_bSkipstartup := IniRead(g_sConfigFile, "General", "bSkipstartup", 0)
+		g_bWindow := IniRead(g_sConfigFile, "General", "bWindow", 0)
 		g_bNoGUI := IniRead(g_sConfigFile, "General", "bNoGUI", 0)
 	}
 }
@@ -209,6 +263,16 @@ WriteSettingsToRegistryAndConfig()
 			IniWrite("`"" g_sModName "`"", g_sConfigFile, "General", "sModName")
 			IniWrite(g_cbUnlockAllDiff.Value, g_sConfigFile, "General", "bUnlockAllDiff")
 			IniWrite(g_cbUnlockAllChapters.Value, g_sConfigFile, "General", "bUnlockAllChapters")
+			IniWrite(g_cbDeveloper.Value, g_sConfigFile, "General", "bDeveloper")
+			IniWrite(g_cbDeveloperKeys.Value, g_sConfigFile, "General", "bDeveloperKeys")
+			IniWrite(g_cbDisable3dpreloads.Value, g_sConfigFile, "General", "bDisable3dpreloads")
+			IniWrite(g_cbNodialog.Value, g_sConfigFile, "General", "bNodialog")
+			IniWrite(g_cbNovidmemcheck.Value, g_sConfigFile, "General", "bNovidmemcheck")
+			IniWrite(g_cbProfile.Value, g_sConfigFile, "General", "bProfile")
+			IniWrite(g_cbScreenshot.Value, g_sConfigFile, "General", "bScreenshot")
+			IniWrite(g_cbShowprogress.Value, g_sConfigFile, "General", "bShowprogress")
+			IniWrite(g_cbSkipstartup.Value, g_sConfigFile, "General", "bSkipstartup")
+			IniWrite(g_cbWindow.Value, g_sConfigFile, "General", "bWindow")
 		}
 	}
 	catch as e
