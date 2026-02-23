@@ -62,16 +62,16 @@ CreateGUI()
 
 	g_gui.AddGroupBox("R12 x12 w225", "Launch parameters")
 	g_gui.AddLink("x20 y130", 'See this <a href="https://www.pcgamingwiki.com/wiki/Max_Payne_2:_The_Fall_of_Max_Payne#Command_line_arguments">link</a> for more details.')
-	g_cbDeveloper := g_gui.AddCheckbox(        "x20 y155", "-developer")
-	g_cbDeveloperKeys := g_gui.AddCheckbox(    "x20 y180", "-developerkeys")
-	g_cbDisable3dpreloads := g_gui.AddCheckbox("x20 y205", "-disable3dpreloads")
-	g_cbNodialog := g_gui.AddCheckbox(         "x20 y230", "-nodialog")
-	g_cbNovidmemcheck := g_gui.AddCheckbox(    "x20 y255", "-novidmemcheck")
-	g_cbProfile := g_gui.AddCheckbox(          "x20 y280", "-profile")
-	g_cbScreenshot := g_gui.AddCheckbox(       "x20 y305", "-screenshot")
-	g_cbShowprogress:= g_gui.AddCheckbox(      "x20 y330", "-showprogress")
-	g_cbSkipstartup := g_gui.AddCheckbox(      "x20 y355", "-skipstartup")
-	g_cbWindow := g_gui.AddCheckbox(           "x20 y380", "-window")
+	g_cbDeveloper := g_gui.AddCheckbox("Checked" g_bDeveloper                 " x20 y155", "-developer")
+	g_cbDeveloperKeys := g_gui.AddCheckbox("Checked" g_bDeveloperKeys         " x20 y180", "-developerkeys")
+	g_cbDisable3dpreloads := g_gui.AddCheckbox("Checked" g_bDisable3dpreloads " x20 y205", "-disable3dpreloads")
+	g_cbNodialog := g_gui.AddCheckbox("Checked" g_bNodialog                   " x20 y230", "-nodialog")
+	g_cbNovidmemcheck := g_gui.AddCheckbox("Checked" g_bNovidmemcheck         " x20 y255", "-novidmemcheck")
+	g_cbProfile := g_gui.AddCheckbox("Checked" g_bProfile                     " x20 y280", "-profile")
+	g_cbScreenshot := g_gui.AddCheckbox("Checked" g_bScreenshot               " x20 y305", "-screenshot")
+	g_cbShowprogress:= g_gui.AddCheckbox("Checked" g_bShowprogress            " x20 y330", "-showprogress")
+	g_cbSkipstartup := g_gui.AddCheckbox("Checked" g_bSkipstartup             " x20 y355", "-skipstartup")
+	g_cbWindow := g_gui.AddCheckbox("Checked" g_bWindow                       " x20 y380", "-window")
 	g_cbShowprogress.OnEvent("Click", GuiCB_Click)
 
 	g_gui.AddGroupBox("R2.3 x12 w225", "Extra")
@@ -223,18 +223,18 @@ GuiStartButton_Click(*)
 		}
 
 		Run(g_sGameExe " " l_sLaunchArgs)
+
+		; We give 15 seconds for the launcher to show up
+		; If the game launcher always hangs, you should consider using https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch
+		if (!WinWaitActive(g_sWinTitle, , 15.0))
+			ExitApp()
+
+		; Send the right keystrokes to the game launcher window
+		ControlSend("{Down}", "ComboBox1", g_sWinTitle) ; ComboBox1 = Display Adapter DDL
+		ControlChooseString(g_sResolution, "ComboBox2", g_sWinTitle) ; ComboBox2 = Screen Mode DDL
+		ControlChooseString(g_sModName, "ComboBox4", g_sWinTitle) ; ComboBox4 = Choose Customized Game DDL
+		ControlSend("{Enter}", "Button1", g_sWinTitle) ; Button1 = Play button
 	}
-
-	; We give 15 seconds for the launcher to show up
-	; If the game launcher always hangs, you should consider using https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch
-	if (!WinWaitActive(g_sWinTitle, , 15.0))
-		ExitApp()
-
-	; Send the right keystrokes to the game launcher window
-	ControlSend("{Down}", "ComboBox1", g_sWinTitle) ; ComboBox1 = Display Adapter DDL
-	ControlChooseString(g_sResolution, "ComboBox2", g_sWinTitle) ; ComboBox2 = Screen Mode DDL
-	ControlChooseString(g_sModName, "ComboBox4", g_sWinTitle) ; ComboBox4 = Choose Customized Game DDL
-	ControlSend("{Enter}", "Button1", g_sWinTitle) ; Button1 = Play button
 }
 
 ReadConfigFile()
