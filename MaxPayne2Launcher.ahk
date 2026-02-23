@@ -44,31 +44,13 @@ CreateGUI()
 	g_gui.SetFont("s10")
 
 	; Resolution
-	g_gui.AddText("Right x10 y10 w50", "Width")
-	g_gui.AddEdit("Number r1 x70 y5 w150")
+	g_gui.AddGroupBox("R3 w225", "Resolution")
+	g_gui.AddText("Right x15 y35 w50", "Width")
+	g_gui.AddEdit("Number R1 x70 y30 w150")
 	g_udWidth := g_gui.AddUpDown("Range640-10000 0x80", g_nWidth)
-	g_gui.AddText("Right x10 y35 w50", "Height")
-	g_gui.AddEdit("Number r1 x70 y30 w150")
+	g_gui.AddText("Right x15 y65 w50", "Height")
+	g_gui.AddEdit("Number R1 x70 y60 w150")
 	g_udHeight := g_gui.AddUpDown("Range480-10000 0x80", g_nHeight)
-
-
-	; Only display the mod DDL if mods were found
-	if (g_arrModFiles.Length > 1)
-	{
-		g_gui.AddText("Right x10 y60 w50", "Mod")
-		g_ddlModName := g_gui.AddDropDownList("Choose1 x70 y55", g_arrModFiles)
-		g_ddlModName.OnEvent("Change", GuiDDLMod_Change)
-
-		if (g_sModName)
-			g_ddlModName.Text := g_sModName
-
-		g_sModName := g_ddlModName.Text
-	}
-
-	g_cbUnlockAllChapters := g_gui.AddCheckbox("x10", "Unlock all chapters")
-	g_cbUnlockAllChapters.OnEvent("Click", GuiCB_Click)
-	g_cbUnlockAllDiff := g_gui.AddCheckbox("x10", "Unlock all difficulties")
-	g_cbUnlockAllDiff.OnEvent("Click", GuiCB_Click)
 
 	try
 	{
@@ -78,19 +60,39 @@ CreateGUI()
 		                           RegRead(g_sGameRegKey "Game Level", "timedmode", 0)
 	}
 
-	g_gui.AddLink(, 'Launch parameters (see this <a href="https://www.pcgamingwiki.com/wiki/Max_Payne_2:_The_Fall_of_Max_Payne#Command_line_arguments">link</a> for details)')
-	g_cbDeveloper := g_gui.AddCheckbox("x10", "-developer")
-	g_cbDeveloperKeys := g_gui.AddCheckbox("x10", "-developerkeys")
-	g_cbDisable3dpreloads := g_gui.AddCheckbox("x10", "-disable3dpreloads")
-	g_cbNodialog := g_gui.AddCheckbox("x10", "-nodialog")
+	g_gui.AddGroupBox("R12 x12 w225", "Launch parameters")
+	g_gui.AddLink("x20 y130", 'See this <a href="https://www.pcgamingwiki.com/wiki/Max_Payne_2:_The_Fall_of_Max_Payne#Command_line_arguments">link</a> for more details.')
+	g_cbDeveloper := g_gui.AddCheckbox("x20 y155", "-developer")
+	g_cbDeveloperKeys := g_gui.AddCheckbox("x20 y180", "-developerkeys")
+	g_cbDisable3dpreloads := g_gui.AddCheckbox("x20 y205", "-disable3dpreloads")
+	g_cbNodialog := g_gui.AddCheckbox("x20 y230", "-nodialog")
 	g_cbNodialog.OnEvent("Click", (*) => g_ddlModName.Enabled := !g_cbNodialog.Value)
-	g_cbNovidmemcheck := g_gui.AddCheckbox("x10", "-novidmemcheck")
-	g_cbProfile := g_gui.AddCheckbox("x10", "-profile")
-	g_cbScreenshot := g_gui.AddCheckbox("x10", "-screenshot")
-	g_cbShowprogress:= g_gui.AddCheckbox("x10", "-showprogress")
+	g_cbNovidmemcheck := g_gui.AddCheckbox("x20 y255", "-novidmemcheck")
+	g_cbProfile := g_gui.AddCheckbox("x20 y280", "-profile")
+	g_cbScreenshot := g_gui.AddCheckbox("x20 y305", "-screenshot")
+	g_cbShowprogress:= g_gui.AddCheckbox("x20 y330", "-showprogress")
 	g_cbShowprogress.OnEvent("Click", (*) => g_cbDeveloper.Value := true)
-	g_cbSkipstartup := g_gui.AddCheckbox("x10", "-skipstartup")
-	g_cbWindow := g_gui.AddCheckbox("x10", "-window")
+	g_cbSkipstartup := g_gui.AddCheckbox("x20 y355", "-skipstartup")
+	g_cbWindow := g_gui.AddCheckbox("x20 y380", "-window")
+
+	g_gui.AddGroupBox("R2.3 x12 w225", "Extra")
+	g_cbUnlockAllChapters := g_gui.AddCheckbox("x20 y435", "Unlock all chapters")
+	g_cbUnlockAllChapters.OnEvent("Click", GuiCB_Click)
+	g_cbUnlockAllDiff := g_gui.AddCheckbox("x20 y460", "Unlock all difficulties")
+	g_cbUnlockAllDiff.OnEvent("Click", GuiCB_Click)
+
+	; Only display the mod DDL if mods were found
+	if (g_arrModFiles.Length > 1)
+	{
+		g_gui.AddText("Right x15 y500 w50", "Mod")
+		g_ddlModName := g_gui.AddDropDownList("Choose1 x70 y495", g_arrModFiles)
+		g_ddlModName.OnEvent("Change", GuiDDLMod_Change)
+
+		if (g_sModName)
+			g_ddlModName.Text := g_sModName
+
+		g_sModName := g_ddlModName.Text
+	}
 
 	g_gui.AddButton("Default x85", "&Start game").OnEvent("Click", GuiStartButton_Click)
 }
