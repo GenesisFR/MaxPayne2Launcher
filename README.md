@@ -7,4 +7,4 @@ The typical use case is to easily specify resolutions above 1080p (otherwise the
 
 The [Startup Hang Patch](https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch/) is heavily recommended.
 
-<img width="254" height="177" alt="image" src="https://github.com/user-attachments/assets/d24d883c-5f26-4e37-be9f-297622bc9fbb" />
+<img width="251" height="593" alt="image" src="https://github.com/user-attachments/assets/8f2b206e-56ea-49c5-8fcc-a808ce971248" />
