@@ -1,5 +1,6 @@
-#Requires AutoHotkey v2
-#SingleInstance Force
+#Requires Autohotkey v2.0 ; Display an error and quit if this version requirement is not met.
+#SingleInstance force     ; Allow only a single instance of the script to run.
+#Warn                     ; Enable warnings to assist with detecting common errors.
 
 ; Do not edit these
 g_sConfigFile := A_ScriptDir "\MaxPayne2Launcher.ini"
@@ -7,17 +8,50 @@ g_sGameExe := "MaxPayne2.exe"
 g_sGameRegKey := "HKEY_CURRENT_USER\Software\Remedy Entertainment\Max Payne 2\"
 g_sWinTitle := "ahk_exe MaxPayne2.exe ahk_class #32770"
 
-ReadConfigFile()
-CheckGameExe()
-GetResolutionFromRegistry()
-CheckMods()
+Init()
 
-if (g_bNoGUI)
-	GuiStartButton_Click()
-else
+BuildLaunchArgs()
 {
-	CreateGUI()
-	g_gui.Show()
+	; Create launch arguments
+	if (g_bNoGUI)
+	{
+		local l_mapArgs := Map(
+			"-developer",         g_bDeveloper,
+			"-developerkeys",     g_bDeveloperKeys,
+			"-disable3dpreloads", g_bDisable3dpreloads,
+			"-nodialog",          g_bNodialog,
+			"-novidmemcheck",     g_bNovidmemcheck,
+			"-profile",           g_bProfile,
+			"-screenshot",        g_bScreenshot,
+			"-showprogress",      g_bShowprogress,
+			"-skipstartup",       g_bSkipstartup,
+			"-window",            g_bWindow
+		)
+	}
+	else
+	{
+		local l_mapArgs := Map(
+			"-developer",         g_cbDeveloper.Value,
+			"-developerkeys",     g_cbDeveloperKeys.Value,
+			"-disable3dpreloads", g_cbDisable3dpreloads.Value,
+			"-nodialog",          g_cbNodialog.Value,
+			"-novidmemcheck",     g_cbNovidmemcheck.Value,
+			"-profile",           g_cbProfile.Value,
+			"-screenshot",        g_cbScreenshot.Value,
+			"-showprogress",      g_cbShowprogress.Value,
+			"-skipstartup",       g_cbSkipstartup.Value,
+			"-window",            g_cbWindow.Value
+		)
+	}
+
+	local l_sLaunchArgs := ""
+	for l_sKey, l_sValue in l_mapArgs
+	{
+		if (l_sValue)
+			l_sLaunchArgs .= l_sLaunchArgs ? " " l_sKey : l_sKey
+	}
+
+	return l_sLaunchArgs
 }
 
 CheckGameExe()
@@ -149,7 +183,7 @@ GetResolutionFromRegistry()
 
 GuiCB_Click(GuiCtrlObj, Info)
 {
-	global
+	global g_bUnlockAllChapters, g_bUnlockAllDiff
 
 	switch GuiCtrlObj
 	{
@@ -170,8 +204,6 @@ GuiDDLMod_Change(*)
 
 GuiStartButton_Click(*)
 {
-	global
-
 	SaveSettings()
 
 	if (!g_bNoGUI)
@@ -183,46 +215,7 @@ GuiStartButton_Click(*)
 	; Otherwise run it
 	else
 	{
-		; Create launch arguments
-		if (g_bNoGUI)
-		{
-			local l_mapArgs := Map(
-				"-developer",         g_bDeveloper,
-				"-developerkeys",     g_bDeveloperKeys,
-				"-disable3dpreloads", g_bDisable3dpreloads,
-				"-nodialog",          g_bNodialog,
-				"-novidmemcheck",     g_bNovidmemcheck,
-				"-profile",           g_bProfile,
-				"-screenshot",        g_bScreenshot,
-				"-showprogress",      g_bShowprogress,
-				"-skipstartup",       g_bSkipstartup,
-				"-window",            g_bWindow
-			)
-		}
-		else
-		{
-			local l_mapArgs := Map(
-				"-developer",         g_cbDeveloper.Value,
-				"-developerkeys",     g_cbDeveloperKeys.Value,
-				"-disable3dpreloads", g_cbDisable3dpreloads.Value,
-				"-nodialog",          g_cbNodialog.Value,
-				"-novidmemcheck",     g_cbNovidmemcheck.Value,
-				"-profile",           g_cbProfile.Value,
-				"-screenshot",        g_cbScreenshot.Value,
-				"-showprogress",      g_cbShowprogress.Value,
-				"-skipstartup",       g_cbSkipstartup.Value,
-				"-window",            g_cbWindow.Value
-			)
-		}
-
-		local l_sLaunchArgs := ""
-		for l_sKey, l_sValue in l_mapArgs
-		{
-			if (l_sValue)
-				l_sLaunchArgs .= l_sLaunchArgs ? " " l_sKey : l_sKey
-		}
-
-		Run(g_sGameExe " " l_sLaunchArgs)
+		Run(g_sGameExe " " BuildLaunchArgs())
 
 		; We give 15 seconds for the launcher to show up
 		; If the game launcher always hangs, you should consider using https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch
@@ -234,6 +227,22 @@ GuiStartButton_Click(*)
 		ControlChooseString(g_sResolution, "ComboBox2", g_sWinTitle) ; ComboBox2 = Screen Mode DDL
 		ControlChooseString(g_sModName, "ComboBox4", g_sWinTitle) ; ComboBox4 = Choose Customized Game DDL
 		ControlSend("{Enter}", "Button1", g_sWinTitle) ; Button1 = Play button
+	}
+}
+
+Init()
+{
+	ReadConfigFile()
+	CheckGameExe()
+	GetResolutionFromRegistry()
+	CheckMods()
+
+	if (g_bNoGUI)
+		GuiStartButton_Click()
+	else
+	{
+		CreateGUI()
+		g_gui.Show()
 	}
 }
 
