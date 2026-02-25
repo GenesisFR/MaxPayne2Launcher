@@ -83,7 +83,7 @@ CreateGUI()
 	local l_nCurrentRow := 0
 	local l_nSpacingX := 10
 	local l_nSpacingY := 25
-	local l_nTopY := 10
+	local l_nTopY := 5
 	; Leftmost controls
 	local l_nLeftWidth := 120
 	local l_nLeftX := 15
@@ -97,15 +97,15 @@ CreateGUI()
 	; Game
 	g_gui.AddGroupBox("R2.5 x" l_nLeftX - 3 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Game")
 	g_gui.AddText("Right x" l_nLeftX " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nLeftWidth, "Choose your game")
-	g_radioMP1 := g_gui.AddRadio("Checked" (g_bMaxPayne2 ? "0" : "1") " x" l_nMiddleX " y" l_nTopY + l_nCurrentRow * l_nSpacingY, "Max Payne 1")
+	g_radioMP1 := g_gui.AddRadio("Checked" (g_bMaxPayne2 ? "0" : "1") " x" l_nMiddleX " y" l_nTopY + l_nCurrentRow * l_nSpacingY, "Max Payne")
 	g_radioMP1.OnEvent("Click", GuiRadio_Click)
 	g_radioMP2 := g_gui.AddRadio("Checked" g_bMaxPayne2 " x" l_nMiddleX + 100 " y" l_nTopY + l_nCurrentRow * l_nSpacingY, "Max Payne 2")
 	g_radioMP2.OnEvent("Click", GuiRadio_Click)
-
-	g_gui.AddText("Right x" l_nLeftX " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nLeftWidth, "Game directory")
-	g_editGameDir := g_gui.AddEdit("CBlack R1 ReadOnly x" l_nMiddleX " y" l_nTopY + l_nCurrentRow * l_nSpacingY - 5 " w" l_nMiddleWidth, g_sGameDir)
 	g_gui.AddButton("Background353434 Default x" l_nRightX " y" l_nTopY + l_nCurrentRow++ * l_nSpacingY - 7 " w" l_nRightWidth, "&Browse").OnEvent("Click",
 	                GuiButtonBrowse_Click)
+
+	g_gui.AddText("Right x" l_nLeftX " y" l_nTopY + l_nCurrentRow * l_nSpacingY + 5 " w" l_nLeftWidth, "Game directory")
+	g_editGameDir := g_gui.AddEdit("CBlack R1 ReadOnly x" l_nMiddleX " y" l_nTopY + l_nCurrentRow++ * l_nSpacingY " w" l_nMiddleWidth + l_nRightWidth + 8, g_sGameDir)
 
 	; Resolution
 	g_gui.AddGroupBox("R2.5 x" l_nLeftX - 3 " y" l_nTopY + l_nSpacingY * ++l_nCurrentRow - 2 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Resolution")
@@ -127,6 +127,7 @@ CreateGUI()
 	g_cbDeveloperKeys := g_gui.AddCheckbox("Checked" g_bDeveloperKeys         " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-developerkeys")
 	g_cbDisable3dpreloads := g_gui.AddCheckbox("Checked" g_bDisable3dpreloads " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-disable3dpreloads")
 	g_cbNodialog := g_gui.AddCheckbox("Checked" g_bNodialog                   " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-nodialog")
+	g_cbNodialog.OnEvent("Click", (*) => MsgBox("Using -nodialog will prevent the game from loading mods!", "Warning", 48))
 	g_cbNovidmemcheck := g_gui.AddCheckbox("Checked" g_bNovidmemcheck         " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-novidmemcheck")
 	g_cbProfile := g_gui.AddCheckbox("Checked" g_bProfile                     " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-profile")
 	g_cbScreenshot := g_gui.AddCheckbox("Checked" g_bScreenshot               " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-screenshot")
