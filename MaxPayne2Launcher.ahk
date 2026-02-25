@@ -184,9 +184,9 @@ GuiButtonBrowse_Click(*)
 
 GuiButtonStart_Click(*)
 {
-	; Turn MsgBoxes into modals
 	if (!g_bNoGUI)
 	{
+		; Turn MsgBoxes into modals
 		g_gui.Opt("+OwnDialogs")
 		SaveSettings()
 		g_gui.Hide()
@@ -267,18 +267,13 @@ Init()
 {
 	ReadConfigFile()
 	UpdateMods()
+	CreateGUI()
+	UpdateGame()
 
 	if (g_bNoGUI)
-	{
-		UpdateGame()
 		GuiButtonStart_Click()
-	}
 	else
-	{
-		CreateGUI()
-		UpdateGame()
 		g_gui.Show()
-	}
 }
 
 ReadConfigFile()
@@ -321,26 +316,23 @@ SaveSettings()
 			RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "timedmode")
 		}
 
-		if (!g_bNoGUI)
-		{
-			IniWrite(g_radioMP2.Value, g_sConfigFile,            "General", "bMaxPayne2")
-			IniWrite(g_sGameDir, g_sConfigFile,                  "General", "sGameDir")
-			IniWrite(g_udWidth.Value, g_sConfigFile,             "General", "nWidth")
-			IniWrite(g_udHeight.Value, g_sConfigFile,            "General", "nHeight")
-			IniWrite(g_sModName, g_sConfigFile,                  "General", "sModName")
-			IniWrite(g_cbUnlockAllChapters.Value, g_sConfigFile, "General", "bUnlockAllChapters")
-			IniWrite(g_cbUnlockAllDiff.Value, g_sConfigFile,     "General", "bUnlockAllDiff")
-			IniWrite(g_cbDeveloper.Value, g_sConfigFile,         "General", "bDeveloper")
-			IniWrite(g_cbDeveloperKeys.Value, g_sConfigFile,     "General", "bDeveloperKeys")
-			IniWrite(g_cbDisable3dpreloads.Value, g_sConfigFile, "General", "bDisable3dpreloads")
-			IniWrite(g_cbNodialog.Value, g_sConfigFile,          "General", "bNodialog")
-			IniWrite(g_cbNovidmemcheck.Value, g_sConfigFile,     "General", "bNovidmemcheck")
-			IniWrite(g_cbProfile.Value, g_sConfigFile,           "General", "bProfile")
-			IniWrite(g_cbScreenshot.Value, g_sConfigFile,        "General", "bScreenshot")
-			IniWrite(g_cbShowprogress.Value, g_sConfigFile,      "General", "bShowprogress")
-			IniWrite(g_cbSkipstartup.Value, g_sConfigFile,       "General", "bSkipstartup")
-			IniWrite(g_cbWindow.Value, g_sConfigFile,            "General", "bWindow")
-		}
+		IniWrite(g_radioMP2.Value, g_sConfigFile,            "General", "bMaxPayne2")
+		IniWrite(g_sGameDir, g_sConfigFile,                  "General", "sGameDir")
+		IniWrite(g_udWidth.Value, g_sConfigFile,             "General", "nWidth")
+		IniWrite(g_udHeight.Value, g_sConfigFile,            "General", "nHeight")
+		IniWrite(g_sModName, g_sConfigFile,                  "General", "sModName")
+		IniWrite(g_cbUnlockAllChapters.Value, g_sConfigFile, "General", "bUnlockAllChapters")
+		IniWrite(g_cbUnlockAllDiff.Value, g_sConfigFile,     "General", "bUnlockAllDiff")
+		IniWrite(g_cbDeveloper.Value, g_sConfigFile,         "General", "bDeveloper")
+		IniWrite(g_cbDeveloperKeys.Value, g_sConfigFile,     "General", "bDeveloperKeys")
+		IniWrite(g_cbDisable3dpreloads.Value, g_sConfigFile, "General", "bDisable3dpreloads")
+		IniWrite(g_cbNodialog.Value, g_sConfigFile,          "General", "bNodialog")
+		IniWrite(g_cbNovidmemcheck.Value, g_sConfigFile,     "General", "bNovidmemcheck")
+		IniWrite(g_cbProfile.Value, g_sConfigFile,           "General", "bProfile")
+		IniWrite(g_cbScreenshot.Value, g_sConfigFile,        "General", "bScreenshot")
+		IniWrite(g_cbShowprogress.Value, g_sConfigFile,      "General", "bShowprogress")
+		IniWrite(g_cbSkipstartup.Value, g_sConfigFile,       "General", "bSkipstartup")
+		IniWrite(g_cbWindow.Value, g_sConfigFile,            "General", "bWindow")
 	}
 	catch as e
 		MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), , 48)
@@ -355,20 +347,16 @@ UpdateGame()
 	g_sWinTitle := "ahk_exe " g_sGameExe " ahk_class #32770"
 	g_sLink := g_bMaxPayne2 ? "https://www.pcgamingwiki.com/wiki/Max_Payne_2:_The_Fall_of_Max_Payne#Command_line_arguments"
 	                        : "https://www.pcgamingwiki.com/wiki/Max_Payne#Command_line_arguments"
+	g_linkPCGW.Text := 'See this <a href="' g_sLink '">link</a> for more details.'
+	g_radioMP2.Value := g_bMaxPayne2
+	g_radioMP1.Value := !g_radioMP2.Value
 
-	if (!g_bNoGUI)
+	try
 	{
-		g_linkPCGW.Text := 'See this <a href="' g_sLink '">link</a> for more details.'
-		g_radioMP2.Value := g_bMaxPayne2
-		g_radioMP1.Value := !g_radioMP2.Value
-
-		try
-		{
-			g_cbUnlockAllChapters.Value := RegRead(g_sGameRegKey "Game Level", "LevelSelector", 0)
-			g_cbUnlockAllDiff.Value := RegRead(g_sGameRegKey "Game Level", "hell", 0) &&
-									RegRead(g_sGameRegKey "Game Level", "nightmare", 0) &&
-									RegRead(g_sGameRegKey "Game Level", "timedmode", 0)
-		}
+		g_cbUnlockAllChapters.Value := RegRead(g_sGameRegKey "Game Level", "LevelSelector", 0)
+		g_cbUnlockAllDiff.Value := RegRead(g_sGameRegKey "Game Level", "hell", 0) &&
+								RegRead(g_sGameRegKey "Game Level", "nightmare", 0) &&
+								RegRead(g_sGameRegKey "Game Level", "timedmode", 0)
 	}
 }
 
