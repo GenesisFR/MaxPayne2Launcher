@@ -306,6 +306,11 @@ SaveSettings()
 {
 	try
 	{
+		; Write to the registry
+		RegWrite(g_nWidth,  "REG_DWORD", g_sGameRegKey "Video Settings", "Display Width")
+		RegWrite(g_nHeight, "REG_DWORD", g_sGameRegKey "Video Settings", "Display Height")
+		RegWrite(g_sModName,   "REG_SZ", g_sGameRegKey "Customized Game", "Customized Game")
+		
 		if (g_bUnlockAllChapters)
 			RegWrite(g_bUnlockAllChapters, "REG_DWORD", g_sGameRegKey "Game Level", "LevelSelector")
 
@@ -316,23 +321,27 @@ SaveSettings()
 			RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "timedmode")
 		}
 
-		IniWrite(g_radioMP2.Value, g_sConfigFile,            "General", "bMaxPayne2")
-		IniWrite(g_sGameDir, g_sConfigFile,                  "General", "sGameDir")
-		IniWrite(g_udWidth.Value, g_sConfigFile,             "General", "nWidth")
-		IniWrite(g_udHeight.Value, g_sConfigFile,            "General", "nHeight")
-		IniWrite(g_sModName, g_sConfigFile,                  "General", "sModName")
-		IniWrite(g_cbUnlockAllChapters.Value, g_sConfigFile, "General", "bUnlockAllChapters")
-		IniWrite(g_cbUnlockAllDiff.Value, g_sConfigFile,     "General", "bUnlockAllDiff")
-		IniWrite(g_cbDeveloper.Value, g_sConfigFile,         "General", "bDeveloper")
-		IniWrite(g_cbDeveloperKeys.Value, g_sConfigFile,     "General", "bDeveloperKeys")
-		IniWrite(g_cbDisable3dpreloads.Value, g_sConfigFile, "General", "bDisable3dpreloads")
-		IniWrite(g_cbNodialog.Value, g_sConfigFile,          "General", "bNodialog")
-		IniWrite(g_cbNovidmemcheck.Value, g_sConfigFile,     "General", "bNovidmemcheck")
-		IniWrite(g_cbProfile.Value, g_sConfigFile,           "General", "bProfile")
-		IniWrite(g_cbScreenshot.Value, g_sConfigFile,        "General", "bScreenshot")
-		IniWrite(g_cbShowprogress.Value, g_sConfigFile,      "General", "bShowprogress")
-		IniWrite(g_cbSkipstartup.Value, g_sConfigFile,       "General", "bSkipstartup")
-		IniWrite(g_cbWindow.Value, g_sConfigFile,            "General", "bWindow")
+		; Write to the config file
+		if (!g_bNoGUI)
+		{
+			IniWrite(g_radioMP2.Value, g_sConfigFile,            "General", "bMaxPayne2")
+			IniWrite(g_sGameDir, g_sConfigFile,                  "General", "sGameDir")
+			IniWrite(g_udWidth.Value, g_sConfigFile,             "General", "nWidth")
+			IniWrite(g_udHeight.Value, g_sConfigFile,            "General", "nHeight")
+			IniWrite(g_sModName, g_sConfigFile,                  "General", "sModName")
+			IniWrite(g_cbUnlockAllChapters.Value, g_sConfigFile, "General", "bUnlockAllChapters")
+			IniWrite(g_cbUnlockAllDiff.Value, g_sConfigFile,     "General", "bUnlockAllDiff")
+			IniWrite(g_cbDeveloper.Value, g_sConfigFile,         "General", "bDeveloper")
+			IniWrite(g_cbDeveloperKeys.Value, g_sConfigFile,     "General", "bDeveloperKeys")
+			IniWrite(g_cbDisable3dpreloads.Value, g_sConfigFile, "General", "bDisable3dpreloads")
+			IniWrite(g_cbNodialog.Value, g_sConfigFile,          "General", "bNodialog")
+			IniWrite(g_cbNovidmemcheck.Value, g_sConfigFile,     "General", "bNovidmemcheck")
+			IniWrite(g_cbProfile.Value, g_sConfigFile,           "General", "bProfile")
+			IniWrite(g_cbScreenshot.Value, g_sConfigFile,        "General", "bScreenshot")
+			IniWrite(g_cbShowprogress.Value, g_sConfigFile,      "General", "bShowprogress")
+			IniWrite(g_cbSkipstartup.Value, g_sConfigFile,       "General", "bSkipstartup")
+			IniWrite(g_cbWindow.Value, g_sConfigFile,            "General", "bWindow")
+		}
 	}
 	catch as e
 		MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), , 48)
@@ -366,7 +375,11 @@ UpdateMods()
 
 	local l_sModExt := g_bMaxPayne2 ? "mp2m" : "mpm"
 
-	; Check for mod file
+	; Retrieve the current mod name from the registry as a fallback if it was empty from a missing key/config file
+	if (!g_sModName)
+		try g_sModName := RegRead(g_sGameRegKey "Customized Game", "Customized Game", "")
+
+	; Look for the mod file
 	if (!g_sModName || (g_sModName != "<none selected>" && !FileExist(g_sGameDir g_sModName "." l_sModExt)))
 		g_sModName := "<none selected>"
 
