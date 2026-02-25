@@ -123,6 +123,7 @@ CreateGUI()
 	g_linkPCGW := g_gui.AddLink("x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY,
 	                            'See this <a href="https://www.pcgamingwiki.com/wiki/Max_Payne_2:_The_Fall_of_Max_Payne#Command_line_arguments">link</a> for more details.')
 	g_cbDeveloper := g_gui.AddCheckbox("Checked" g_bDeveloper                 " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-developer")
+	g_cbDeveloper.OnEvent("Click", GuiCB_Click)
 	g_cbDeveloperKeys := g_gui.AddCheckbox("Checked" g_bDeveloperKeys         " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-developerkeys")
 	g_cbDisable3dpreloads := g_gui.AddCheckbox("Checked" g_bDisable3dpreloads " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-disable3dpreloads")
 	g_cbNodialog := g_gui.AddCheckbox("Checked" g_bNodialog                   " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-nodialog")
@@ -147,7 +148,6 @@ CreateGUI()
 	g_gui.AddGroupBox("R1.5 x" l_nLeftX - 3 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 10 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Choose customized game")
 	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 10 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + 5, g_arrModFiles)
 	g_ddlCustomGame.OnEvent("Change", GuiDDL_Change)
-	g_cbNodialog.OnEvent("Click", (*) => g_ddlCustomGame.Enabled := !g_cbNodialog.Value)
 
 	if (g_sModName)
 		g_ddlCustomGame.Text := g_sModName
@@ -222,13 +222,16 @@ GuiCB_Click(GuiCtrlObj, Info)
 
 	switch GuiCtrlObj
 	{
+		case g_cbDeveloper:
+			if (!g_cbDeveloper.Value)
+				g_cbShowprogress.Value := false
+		case g_cbShowprogress:
+			if (g_cbShowprogress.Value)
+				g_cbDeveloper.Value := true
 		case g_cbUnlockAllChapters:
 			g_bUnlockAllChapters := g_cbUnlockAllChapters.Value
 		case g_cbUnlockAllDiff:
 			g_bUnlockAllDiff := g_cbUnlockAllDiff.Value
-		case g_cbShowprogress:
-			if (g_cbShowprogress.Value)
-				g_cbDeveloper.Value := true
 	}
 }
 
