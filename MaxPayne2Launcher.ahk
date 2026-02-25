@@ -2,10 +2,7 @@
 #SingleInstance force     ; Allow only a single instance of the script to run.
 #Warn                     ; Enable warnings to assist with detecting common errors.
 
-;TODO
-; fix crash when using nodialog
-
-; Do not edit these
+; Do not edit this
 g_sConfigFile := A_ScriptDir "\MaxPayne2Launcher.ini"
 
 Init()
@@ -188,12 +185,12 @@ GuiButtonBrowse_Click(*)
 GuiButtonStart_Click(*)
 {
 	; Turn MsgBoxes into modals
-	g_gui.Opt("+OwnDialogs")
-
-	SaveSettings()
-
 	if (!g_bNoGUI)
+	{
+		g_gui.Opt("+OwnDialogs")
+		SaveSettings()
 		g_gui.Hide()
+	}
 
 	; If the launcher is already running, activate it
 	if (WinExist(g_sWinTitle))
@@ -272,7 +269,10 @@ Init()
 	UpdateMods()
 
 	if (g_bNoGUI)
+	{
+		UpdateGame()
 		GuiButtonStart_Click()
+	}
 	else
 	{
 		CreateGUI()
@@ -355,16 +355,20 @@ UpdateGame()
 	g_sWinTitle := "ahk_exe " g_sGameExe " ahk_class #32770"
 	g_sLink := g_bMaxPayne2 ? "https://www.pcgamingwiki.com/wiki/Max_Payne_2:_The_Fall_of_Max_Payne#Command_line_arguments"
 	                        : "https://www.pcgamingwiki.com/wiki/Max_Payne#Command_line_arguments"
-	g_linkPCGW.Text := 'See this <a href="' g_sLink '">link</a> for more details.'
-	g_radioMP2.Value := g_bMaxPayne2
-	g_radioMP1.Value := !g_radioMP2.Value
 
-	try
+	if (!g_bNoGUI)
 	{
-		g_cbUnlockAllChapters.Value := RegRead(g_sGameRegKey "Game Level", "LevelSelector", 0)
-		g_cbUnlockAllDiff.Value := RegRead(g_sGameRegKey "Game Level", "hell", 0) &&
-		                           RegRead(g_sGameRegKey "Game Level", "nightmare", 0) &&
-		                           RegRead(g_sGameRegKey "Game Level", "timedmode", 0)
+		g_linkPCGW.Text := 'See this <a href="' g_sLink '">link</a> for more details.'
+		g_radioMP2.Value := g_bMaxPayne2
+		g_radioMP1.Value := !g_radioMP2.Value
+
+		try
+		{
+			g_cbUnlockAllChapters.Value := RegRead(g_sGameRegKey "Game Level", "LevelSelector", 0)
+			g_cbUnlockAllDiff.Value := RegRead(g_sGameRegKey "Game Level", "hell", 0) &&
+									RegRead(g_sGameRegKey "Game Level", "nightmare", 0) &&
+									RegRead(g_sGameRegKey "Game Level", "timedmode", 0)
+		}
 	}
 }
 
