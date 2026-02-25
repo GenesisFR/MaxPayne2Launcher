@@ -4,7 +4,6 @@
 
 ;TODO
 ; fix crash when using nodialog
-; fix crash when reading incorrect boolean values
 
 ; Do not edit these
 g_sConfigFile := A_ScriptDir "\MaxPayne2Launcher.ini"
@@ -286,24 +285,24 @@ ReadConfigFile()
 {
 	global
 
-	g_bMaxPayne2 := IniRead(g_sConfigFile,         "General", "bMaxPayne2", true)
+	g_bMaxPayne2 := IniRead(g_sConfigFile,         "General", "bMaxPayne2", true) == true
 	g_sGameDir := IniRead(g_sConfigFile,           "General", "sGameDir", "C:\Program Files\Steam\steamapps\common\Max Payne 2\")
 	g_nWidth := IniRead(g_sConfigFile,             "General", "nWidth", 2560)
 	g_nHeight := IniRead(g_sConfigFile,            "General", "nHeight", 1440)
 	g_sModName := IniRead(g_sConfigFile,           "General", "sModName", "")
-	g_bUnlockAllChapters := IniRead(g_sConfigFile, "General", "bUnlockAllChapters", false)
-	g_bUnlockAllDiff := IniRead(g_sConfigFile,     "General", "bUnlockAllDiff", false)
-	g_bDeveloper := IniRead(g_sConfigFile,         "General", "bDeveloper", false)
-	g_bDeveloperKeys := IniRead(g_sConfigFile,     "General", "bDeveloperKeys", false)
-	g_bDisable3dpreloads := IniRead(g_sConfigFile, "General", "bDisable3dpreloads", false)
-	g_bNodialog := IniRead(g_sConfigFile,          "General", "bNodialog", false)
-	g_bNovidmemcheck := IniRead(g_sConfigFile,     "General", "bNovidmemcheck", false)
-	g_bProfile := IniRead(g_sConfigFile,           "General", "bProfile", false)
-	g_bScreenshot := IniRead(g_sConfigFile,        "General", "bScreenshot", false)
-	g_bShowprogress := IniRead(g_sConfigFile,      "General", "bShowprogress", false)
-	g_bSkipstartup := IniRead(g_sConfigFile,       "General", "bSkipstartup", false)
-	g_bWindow := IniRead(g_sConfigFile,            "General", "bWindow", false)
-	g_bNoGUI := IniRead(g_sConfigFile,             "General", "bNoGUI", false)
+	g_bUnlockAllChapters := IniRead(g_sConfigFile, "General", "bUnlockAllChapters", false) == true
+	g_bUnlockAllDiff := IniRead(g_sConfigFile,     "General", "bUnlockAllDiff", false) == true
+	g_bDeveloper := IniRead(g_sConfigFile,         "General", "bDeveloper", false) == true
+	g_bDeveloperKeys := IniRead(g_sConfigFile,     "General", "bDeveloperKeys", false) == true
+	g_bDisable3dpreloads := IniRead(g_sConfigFile, "General", "bDisable3dpreloads", false) == true
+	g_bNodialog := IniRead(g_sConfigFile,          "General", "bNodialog", false) == true
+	g_bNovidmemcheck := IniRead(g_sConfigFile,     "General", "bNovidmemcheck", false) == true
+	g_bProfile := IniRead(g_sConfigFile,           "General", "bProfile", false) == true
+	g_bScreenshot := IniRead(g_sConfigFile,        "General", "bScreenshot", false) == true
+	g_bShowprogress := IniRead(g_sConfigFile,      "General", "bShowprogress", false) == true
+	g_bSkipstartup := IniRead(g_sConfigFile,       "General", "bSkipstartup", false) == true
+	g_bWindow := IniRead(g_sConfigFile,            "General", "bWindow", false) == true
+	g_bNoGUI := IniRead(g_sConfigFile,             "General", "bNoGUI", false) == true
 
 	g_sResolution := g_nWidth " x " g_nHeight " x 32"
 }
