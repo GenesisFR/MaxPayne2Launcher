@@ -2,6 +2,10 @@
 #SingleInstance force     ; Allow only a single instance of the script to run.
 #Warn                     ; Enable warnings to assist with detecting common errors.
 
+;TODO
+; add support for widescreen fix
+; add support for xbox rain droplets
+
 ; Do not edit this
 g_sConfigFile := A_ScriptDir "\MaxPayne2Launcher.ini"
 
@@ -60,12 +64,9 @@ CheckGameExe()
 	{
 		; Not found, check in the current directory
 		if (!FileExist(g_sGameExe))
-		{
-			MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Error", 16)
 			return false
-		}
 		else
-			g_sGameDir := A_WorkingDir
+			g_sGameDir := g_editGameDir.Text := A_WorkingDir "\"
 	}
 
 	return true
@@ -76,7 +77,7 @@ CreateGUI()
 	global
 
 	g_gui := Gui("-MinimizeBox -MaximizeBox", "Max Payne Launcher")
-	g_gui.BackColor := "353434"
+	g_gui.BackColor := "1F1F1F"
 	g_gui.SetFont("CWhite s10")
 
 	; Layout constants
@@ -98,17 +99,16 @@ CreateGUI()
 	g_gui.AddGroupBox("R2.5 x" l_nLeftX - 3 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Game")
 	g_gui.AddText("Right x" l_nLeftX " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nLeftWidth, "Choose your game")
 	g_radioMP1 := g_gui.AddRadio("Checked" (g_bMaxPayne2 ? "0" : "1") " x" l_nMiddleX " y" l_nTopY + l_nCurrentRow * l_nSpacingY, "Max Payne")
-	g_radioMP1.OnEvent("Click", GuiRadio_Click)
 	g_radioMP2 := g_gui.AddRadio("Checked" g_bMaxPayne2 " x" l_nMiddleX + 100 " y" l_nTopY + l_nCurrentRow * l_nSpacingY, "Max Payne 2")
-	g_radioMP2.OnEvent("Click", GuiRadio_Click)
-	g_gui.AddButton("Background353434 Default x" l_nRightX " y" l_nTopY + l_nCurrentRow++ * l_nSpacingY - 7 " w" l_nRightWidth, "&Browse").OnEvent("Click",
+	g_gui.AddButton("Background1F1F1F Default x" l_nRightX " y" l_nTopY + l_nCurrentRow++ * l_nSpacingY - 7 " w" l_nRightWidth, "&Browse").OnEvent("Click",
 	                GuiButtonBrowse_Click)
 
 	g_gui.AddText("Right x" l_nLeftX " y" l_nTopY + l_nCurrentRow * l_nSpacingY + 5 " w" l_nLeftWidth, "Game directory")
-	g_editGameDir := g_gui.AddEdit("CBlack R1 ReadOnly x" l_nMiddleX " y" l_nTopY + l_nCurrentRow++ * l_nSpacingY " w" l_nMiddleWidth + l_nRightWidth + 8, g_sGameDir)
+	g_editGameDir := g_gui.AddEdit("CBlack R1 ReadOnly x" l_nMiddleX " y" l_nTopY + l_nCurrentRow++ * l_nSpacingY " w" l_nMiddleWidth + l_nRightWidth + l_nSpacingX - 2, g_sGameDir)
 
 	; Resolution
-	g_gui.AddGroupBox("R2.5 x" l_nLeftX - 3 " y" l_nTopY + l_nSpacingY * ++l_nCurrentRow - 2 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Resolution")
+	g_gui.AddGroupBox("R2.5 x" l_nLeftX - 3 " y" l_nTopY + l_nSpacingY * ++l_nCurrentRow - 2
+	                  " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Resolution")
 	g_gui.AddText("Right x" l_nLeftX " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nLeftWidth, "Width")
 	g_gui.AddEdit("CBlack Number R1 x" l_nMiddleX " y" l_nTopY + l_nCurrentRow * l_nSpacingY - 5 " w" l_nMiddleWidth)
 	g_udWidth := g_gui.AddUpDown("Range640-10000 0x80", g_nWidth)
@@ -123,16 +123,13 @@ CreateGUI()
 	g_linkPCGW := g_gui.AddLink("x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY,
 	                            'See this <a href="https://www.pcgamingwiki.com/wiki/Max_Payne_2:_The_Fall_of_Max_Payne#Command_line_arguments">link</a> for more details.')
 	g_cbDeveloper := g_gui.AddCheckbox("Checked" g_bDeveloper                 " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-developer")
-	g_cbDeveloper.OnEvent("Click", GuiCB_Click)
 	g_cbDeveloperKeys := g_gui.AddCheckbox("Checked" g_bDeveloperKeys         " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-developerkeys")
 	g_cbDisable3dpreloads := g_gui.AddCheckbox("Checked" g_bDisable3dpreloads " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-disable3dpreloads")
 	g_cbNodialog := g_gui.AddCheckbox("Checked" g_bNodialog                   " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-nodialog")
-	g_cbNodialog.OnEvent("Click", (*) => MsgBox("Using -nodialog will prevent the game from loading mods!", "Warning", 48))
 	g_cbNovidmemcheck := g_gui.AddCheckbox("Checked" g_bNovidmemcheck         " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-novidmemcheck")
 	g_cbProfile := g_gui.AddCheckbox("Checked" g_bProfile                     " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-profile")
 	g_cbScreenshot := g_gui.AddCheckbox("Checked" g_bScreenshot               " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-screenshot")
 	g_cbShowprogress:= g_gui.AddCheckbox("Checked" g_bShowprogress            " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-showprogress")
-	g_cbShowprogress.OnEvent("Click", GuiCB_Click)
 	g_cbSkipstartup := g_gui.AddCheckbox("Checked" g_bSkipstartup             " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-skipstartup")
 	g_cbWindow := g_gui.AddCheckbox("Checked" g_bWindow                       " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-window")
 
@@ -140,21 +137,31 @@ CreateGUI()
 	l_nCurrentRow++
 	g_gui.AddGroupBox("R2.45 x" l_nLeftX - 3 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 5 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Extras")
 	g_cbUnlockAllChapters := g_gui.AddCheckbox("x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 5, "Unlock all chapters")
-	g_cbUnlockAllChapters.OnEvent("Click", GuiCB_Click)
 	g_cbUnlockAllDiff := g_gui.AddCheckbox("x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 5, "Unlock all difficulties")
-	g_cbUnlockAllDiff.OnEvent("Click", GuiCB_Click)
 
 	l_nCurrentRow++
 
-	g_gui.AddGroupBox("R1.5 x" l_nLeftX - 3 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 10 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Choose customized game")
-	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 10 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + 5, g_arrModFiles)
-	g_ddlCustomGame.OnEvent("Change", GuiDDL_Change)
+	; Customized game
+	g_gui.AddGroupBox("R1.5 x" l_nLeftX - 3 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 10 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4,
+	                  "Choose customized game")
+	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 10
+	                                         " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + 5, g_arrModFiles)
 
 	if (g_sModName)
 		g_ddlCustomGame.Text := g_sModName
 
-	g_btnStart := g_gui.AddButton("Background353434 Default x195 w" l_nRightWidth, "&Start game")
-	g_btnStart.OnEvent("Click", GuiButtonStart_Click)
+	g_btnStart := g_gui.AddButton("Background1F1F1F Default x195 w" l_nRightWidth, "&Start game")
+
+	; Events
+	g_radioMP1.OnEvent(           "Click", GuiRadio_Click)
+	g_radioMP2.OnEvent(           "Click", GuiRadio_Click)
+	g_cbDeveloper.OnEvent(        "Click", GuiCB_Click)
+	g_cbNodialog.OnEvent(         "Click", GuiCB_Click)
+	g_cbShowprogress.OnEvent(     "Click", GuiCB_Click)
+	g_cbUnlockAllChapters.OnEvent("Click", GuiCB_Click)
+	g_cbUnlockAllDiff.OnEvent(    "Click", GuiCB_Click)
+	g_ddlCustomGame.OnEvent(     "Change", GuiDDL_Change)
+	g_btnStart.OnEvent(           "Click", GuiButtonStart_Click)
 }
 
 GuiButtonBrowse_Click(*)
@@ -169,7 +176,7 @@ GuiButtonBrowse_Click(*)
 
 	if (l_sGameExe ~= "i)\A(maxpayne.exe|maxpayne2.exe)\z")
 	{
-		g_editGameDir.Value := g_sGameDir := l_sGameDir "\"
+		g_editGameDir.Text := g_sGameDir := l_sGameDir "\"
 
 		; Change the game
 		g_bMaxPayne2 := g_radioMP2.Value := l_sGameExe = "MaxPayne2.exe"
@@ -189,9 +196,10 @@ GuiButtonStart_Click(*)
 	{
 		; Turn MsgBoxes into modals
 		g_gui.Opt("+OwnDialogs")
-		SaveSettings()
 		g_gui.Hide()
 	}
+
+	SaveSettings()
 
 	; If the launcher is already running, activate it
 	if (WinExist(g_sWinTitle))
@@ -200,7 +208,10 @@ GuiButtonStart_Click(*)
 	else
 	{
 		if (!CheckGameExe())
+		{
+			MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Error", 16)
 			return
+		}
 
 		Run(g_sGameDir g_sGameExe " " BuildLaunchArgs())
 
@@ -221,11 +232,17 @@ GuiCB_Click(GuiCtrlObj, Info)
 {
 	global g_bUnlockAllChapters, g_bUnlockAllDiff
 
+	; Turn MsgBox into a modal
+	g_gui.Opt("+OwnDialogs")
+
 	switch GuiCtrlObj
 	{
 		case g_cbDeveloper:
 			if (!g_cbDeveloper.Value)
 				g_cbShowprogress.Value := false
+		case g_cbNodialog:
+			if (g_cbNodialog.Value)
+				MsgBox("Using -nodialog will prevent the game from loading mods!", "Warning", 48) 
 		case g_cbShowprogress:
 			if (g_cbShowprogress.Value)
 				g_cbDeveloper.Value := true
@@ -257,11 +274,12 @@ GuiRadio_Click(GuiCtrlObj, Info)
 			g_editGameDir.Text := RegExReplace(g_editGameDir.Text, "i)(.*)Max Payne\\$", "$1Max Payne 2\", , 1)
 	}
 
+	; Change the game
 	g_sGameDir := g_editGameDir.Text
 	UpdateGame()
-	UpdateMods()
 
 	; Refresh the mod list
+	UpdateMods()
 	g_ddlCustomGame.Delete()
 	g_ddlCustomGame.Add(g_arrModFiles)
 	g_ddlCustomGame.Choose(1)
@@ -273,6 +291,7 @@ Init()
 	UpdateMods()
 	CreateGUI()
 	UpdateGame()
+	CheckGameExe()
 
 	if (g_bNoGUI)
 		GuiButtonStart_Click()
