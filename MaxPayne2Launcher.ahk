@@ -309,7 +309,7 @@ GuiButtonStart_Click(*)
 	}
 
 	; Send the right keystrokes to the game launcher window
-	ControlSend("{Down}", "ComboBox1", g_sWinTitle) ; ComboBox1 = Display Adapter DDL
+	ControlSend("{End}", "ComboBox1", g_sWinTitle) ; ComboBox1 = Display Adapter DDL
 	ControlChooseString(g_sResolution, "ComboBox2", g_sWinTitle) ; ComboBox2 = Screen Mode DDL
 	ControlChooseString(g_sModName, "ComboBox4", g_sWinTitle) ; ComboBox4 = Choose Customized Game DDL
 	ControlSend("{Enter}", "Button1", g_sWinTitle) ; Button1 = Play button
