@@ -9,39 +9,20 @@ Init()
 
 BuildLaunchArgs()
 {
-	; Create launch arguments
-	if (g_bNoGUI)
-	{
-		local l_mapArgs := Map(
-			"-developer",         g_bDeveloper,
-			"-developerkeys",     g_bDeveloperKeys,
-			"-disable3dpreloads", g_bDisable3dpreloads,
-			"-nodialog",          g_bNodialog,
-			"-novidmemcheck",     g_bNovidmemcheck,
-			"-profile",           g_bProfile,
-			"-screenshot",        g_bScreenshot,
-			"-showprogress",      g_bShowprogress,
-			"-skipstartup",       g_bSkipstartup,
-			"-window",            g_bWindow
-		)
-	}
-	else
-	{
-		local l_mapArgs := Map(
-			"-developer",         g_cbDeveloper.Value,
-			"-developerkeys",     g_cbDeveloperKeys.Value,
-			"-disable3dpreloads", g_cbDisable3dpreloads.Value,
-			"-nodialog",          g_cbNodialog.Value,
-			"-novidmemcheck",     g_cbNovidmemcheck.Value,
-			"-profile",           g_cbProfile.Value,
-			"-screenshot",        g_cbScreenshot.Value,
-			"-showprogress",      g_cbShowprogress.Value,
-			"-skipstartup",       g_cbSkipstartup.Value,
-			"-window",            g_cbWindow.Value
-		)
-	}
+	l_mapArgs := Map(
+		"-developer",         g_cbDeveloper.Value,
+		"-developerkeys",     g_cbDeveloperKeys.Value,
+		"-disable3dpreloads", g_cbDisable3dpreloads.Value,
+		"-nodialog",          g_cbNodialog.Value,
+		"-novidmemcheck",     g_cbNovidmemcheck.Value,
+		"-profile",           g_cbProfile.Value,
+		"-screenshot",        g_cbScreenshot.Value,
+		"-showprogress",      g_cbShowprogress.Value,
+		"-skipstartup",       g_cbSkipstartup.Value,
+		"-window",            g_cbWindow.Value
+	)
 
-	local l_sLaunchArgs := ""
+	l_sLaunchArgs := ""
 	for l_sKey, l_sValue in l_mapArgs
 	{
 		if (l_sValue)
@@ -387,20 +368,20 @@ GuiRadio_Click(GuiCtrlObj, Info)
 Init()
 {
 	ReadConfigFile()
-
 	CreateGui()
 	UpdateGame()
 	CheckGameExe()
 	UpdateMods()
 
-	ReadWidescreenFixConfigFile()
-	ReadXboxRainDropletsConfigFile()
-	CreateGuiWidescreen()
-
 	if (g_bNoGUI)
 		GuiButtonStart_Click()
 	else
+	{
+		ReadWidescreenFixConfigFile()
+		ReadXboxRainDropletsConfigFile()
+		CreateGuiWidescreen()
 		g_gui.Show()
+	}
 }
 
 ReadConfigFile()
@@ -469,7 +450,7 @@ ReadXboxRainDropletsConfigFile()
 	global
 	g_sXboxRainDropletsConfigFile := g_sGameDir "scripts\MaxPayne2.XboxRainDroplets.ini"
 
-	if (!g_bNoGUI && g_bMaxPayne2 && FileExist(g_sXboxRainDropletsConfigFile))
+	if (!g_bNoGUI && FileExist(g_sXboxRainDropletsConfigFile))
 	{
 		g_nMinSize        := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "MinSize", 4)
 		g_nMaxSize        := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "MaxSize", 15)
@@ -528,8 +509,7 @@ SaveSettings()
 
 SaveWidescreenFixSettings()
 {
-	global
-	g_sWidescreenFixConfigFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".WidescreenFix.ini"
+	global g_sWidescreenFixConfigFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".WidescreenFix.ini"
 
 	if (!g_bNoGUI && FileExist(g_sWidescreenFixConfigFile))
 	{
@@ -567,7 +547,7 @@ SaveXboxRainDropletsSettings()
 	global
 	g_sXboxRainDropletsConfigFile := g_sGameDir "scripts\MaxPayne2.XboxRainDroplets.ini"
 
-	if (!g_bNoGUI && g_bMaxPayne2 && FileExist(g_sXboxRainDropletsConfigFile))
+	if (!g_bNoGUI && FileExist(g_sXboxRainDropletsConfigFile))
 	{
 		try
 		{
@@ -609,8 +589,7 @@ UpdateGame()
 
 UpdateMods()
 {
-	global
-
+	global g_arrModFiles, g_sModName
 	local l_sModExt := g_bMaxPayne2 ? "mp2m" : "mpm"
 
 	; Retrieve the current mod name from the registry as a fallback if it was empty from a missing key/config file
