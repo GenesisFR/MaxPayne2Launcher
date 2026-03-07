@@ -271,21 +271,21 @@ GuiButtonBrowse_Click(*)
 
 GuiButtonStart_Click(*)
 {
-	if (!g_bNoGUI)
-	{
-		; Turn MsgBoxes into modals
-		g_gui.Opt("+OwnDialogs")
-		g_gui.Hide()
-	}
+	g_gui.Hide()
 
 	SaveSettings()
 	SaveWidescreenFixSettings()
 	SaveXboxRainDropletsSettings()
 
-	; If the launcher is already running, activate it
-	if (WinExist(g_sWinTitle))
-		WinActivate(g_sWinTitle)
-	; Otherwise run it
+	; If the launcher/game is already running, activate it
+	if (WinExist(g_sWinTitleSplash))
+		WinActivate(g_sWinTitleSplash)
+	else if (WinExist(g_sWinTitleGame))
+	{
+		WinActivate(g_sWinTitleGame)
+		return
+	}
+	; Otherwise start the launcher
 	else
 	{
 		if (!CheckGameExe())
@@ -297,16 +297,16 @@ GuiButtonStart_Click(*)
 		Run(g_sGameDir g_sGameExe " " BuildLaunchArgs())
 
 		; We give 15 seconds for the launcher to show up
-		; If the game launcher always hangs, you should consider using https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch
-		if (!WinWaitActive(g_sWinTitle, , 15.0))
-			ExitApp()
+		; If it always hangs, you should consider using https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch
+		if (!WinWaitActive(g_sWinTitleSplash, , 15.0))
+			return
 	}
 
 	; Send the right keystrokes to the game launcher window
-	ControlSend("{End}", "ComboBox1", g_sWinTitle) ; ComboBox1 = Display Adapter DDL
-	ControlChooseString(g_sResolution, "ComboBox2", g_sWinTitle) ; ComboBox2 = Screen Mode DDL
-	ControlChooseString(g_sModName, "ComboBox4", g_sWinTitle) ; ComboBox4 = Choose Customized Game DDL
-	ControlSend("{Enter}", "Button1", g_sWinTitle) ; Button1 = Play button
+	ControlSend("{End}", "ComboBox1", g_sWinTitleSplash) ; ComboBox1 = Display Adapter DDL
+	ControlChooseString(g_sResolution, "ComboBox2", g_sWinTitleSplash) ; ComboBox2 = Screen Mode DDL
+	ControlChooseString(g_sModName, "ComboBox4", g_sWinTitleSplash) ; ComboBox4 = Choose Customized Game DDL
+	ControlSend("{Enter}", "Button1", g_sWinTitleSplash) ; Button1 = Play button
 }
 
 GuiCB_Click(GuiCtrlObj, Info)
@@ -571,7 +571,8 @@ UpdateGame()
 
 	g_sGameExe := "MaxPayne" (g_bMaxPayne2 ? "2" : "") ".exe"
 	g_sGameRegKey := "HKEY_CURRENT_USER\Software\Remedy Entertainment\Max Payne" (g_bMaxPayne2 ? " 2\" : "\")
-	g_sWinTitle := "ahk_exe " g_sGameExe " ahk_class #32770"
+	g_sWinTitleGame := "ahk_exe " g_sGameExe " ahk_class MaxPayne" (g_bMaxPayne2 ? "2" : "")
+	g_sWinTitleSplash := "ahk_exe " g_sGameExe " ahk_class #32770"
 	g_sLink := g_bMaxPayne2 ? "https://www.pcgamingwiki.com/wiki/Max_Payne_2:_The_Fall_of_Max_Payne#Command_line_arguments"
 	                        : "https://www.pcgamingwiki.com/wiki/Max_Payne#Command_line_arguments"
 	g_linkPCGW.Text := 'See this <a href="' g_sLink '">link</a> for more details.'
