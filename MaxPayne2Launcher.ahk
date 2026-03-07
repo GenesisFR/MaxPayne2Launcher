@@ -68,7 +68,7 @@ CheckGameExe()
 	return true
 }
 
-CreateGUI()
+CreateGui()
 {
 	global
 
@@ -91,7 +91,7 @@ CreateGUI()
 	local l_nRightX := l_nMiddleX + l_nMiddleWidth + l_nSpacingX
 	local l_nRightWidth := 100
 
-	g_tab := g_gui.AddTab3(, !FileExist(g_sWidescreenFixConfigFile) ? ["General"] : ["General", "Widescreen"])
+	g_tab := g_gui.AddTab3(, ["General"])
 
 	; Game
 	g_gui.AddGroupBox("R2.5 x" l_nLeftX - 4 " y" l_nTopY " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Game")
@@ -148,13 +148,44 @@ CreateGUI()
 
 	g_btnStart := g_gui.AddButton("Background1F1F1F Default x210 w" l_nRightWidth, "&Start game")
 
+	; Events
+	g_radioMP1.OnEvent(           "Click", GuiRadio_Click)
+	g_radioMP2.OnEvent(           "Click", GuiRadio_Click)
+	g_cbDeveloper.OnEvent(        "Click", GuiCB_Click)
+	g_cbDeveloperKeys.OnEvent(    "Click", GuiCB_Click)
+	g_cbNodialog.OnEvent(         "Click", GuiCB_Click)
+	g_cbShowprogress.OnEvent(     "Click", GuiCB_Click)
+	g_cbUnlockAllChapters.OnEvent("Click", GuiCB_Click)
+	g_cbUnlockAllDiff.OnEvent(    "Click", GuiCB_Click)
+	g_ddlCustomGame.OnEvent(     "Change", GuiDDL_Change)
+	g_btnStart.OnEvent(           "Click", GuiButtonStart_Click)
+}
+
+CreateGuiWidescreen()
+{
+	global
+
+	; Layout constants
+	local l_nCurrentRow := 0
+	local l_nSpacingX := 10
+	local l_nSpacingY := 25
+	local l_nTopY := 35
+	; Leftmost controls
+	local l_nLeftWidth := 120
+	local l_nLeftX := 35
+	; Middle controls
+	local l_nMiddleX := l_nLeftX + l_nLeftWidth + l_nSpacingX + 40
+	local l_nMiddleWidth := 200
+	; Rightmost controls
+	local l_nRightX := l_nMiddleX + l_nMiddleWidth + l_nSpacingX
+	local l_nRightWidth := 100
+
 	; Widescreen fix settings
 	if (FileExist(g_sWidescreenFixConfigFile))
 	{
-		l_nCurrentRow := 0
-		l_nMiddleX += 40
-
+		g_tab.Add(["Widescreen"])
 		g_tab.UseTab(2)
+
 		g_gui.AddGroupBox("R11.5 x" l_nLeftX - 4 " y" l_nTopY " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Widescreen fix")
 
 		g_cbAllowAltTabbingWithoutPausing := g_gui.AddCheckbox("Checked" g_bAllowAltTabbingWithoutPausing " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY,
@@ -232,18 +263,6 @@ CreateGUI()
 			g_sliderSpeedAdjuster.OnEvent("Change", (*) => g_editSpeedAdjuster.Text := Round(g_sliderSpeedAdjuster.Value / 10.0, 1))
 		}
 	}
-
-	; Events
-	g_radioMP1.OnEvent(           "Click", GuiRadio_Click)
-	g_radioMP2.OnEvent(           "Click", GuiRadio_Click)
-	g_cbDeveloper.OnEvent(        "Click", GuiCB_Click)
-	g_cbDeveloperKeys.OnEvent(    "Click", GuiCB_Click)
-	g_cbNodialog.OnEvent(         "Click", GuiCB_Click)
-	g_cbShowprogress.OnEvent(     "Click", GuiCB_Click)
-	g_cbUnlockAllChapters.OnEvent("Click", GuiCB_Click)
-	g_cbUnlockAllDiff.OnEvent(    "Click", GuiCB_Click)
-	g_ddlCustomGame.OnEvent(     "Change", GuiDDL_Change)
-	g_btnStart.OnEvent(           "Click", GuiButtonStart_Click)
 }
 
 GuiButtonBrowse_Click(*)
@@ -369,13 +388,15 @@ GuiRadio_Click(GuiCtrlObj, Info)
 Init()
 {
 	ReadConfigFile()
-	ReadWidescreenFixConfigFile()
-	ReadXboxRainDropletsConfigFile()
 
-	CreateGUI()
+	CreateGui()
 	UpdateGame()
 	CheckGameExe()
 	UpdateMods()
+
+	ReadWidescreenFixConfigFile()
+	ReadXboxRainDropletsConfigFile()
+	CreateGuiWidescreen()
 
 	if (g_bNoGUI)
 		GuiButtonStart_Click()
