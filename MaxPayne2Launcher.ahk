@@ -144,11 +144,7 @@ CreateGUI()
 	; Customized game
 	g_gui.AddGroupBox("R1.5 x" l_nLeftX - 4 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 10 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4,
 	                  "Choose customized game")
-	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 10
-	                                         " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + 5, g_arrModFiles)
-
-	if (g_sModName)
-		g_ddlCustomGame.Text := g_sModName
+	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 10 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + 5)
 
 	g_btnStart := g_gui.AddButton("Background1F1F1F Default x210 w" l_nRightWidth, "&Start game")
 
@@ -270,9 +266,6 @@ GuiButtonBrowse_Click(*)
 
 		; Refresh the mod list
 		UpdateMods()
-		g_ddlCustomGame.Delete()
-		g_ddlCustomGame.Add(g_arrModFiles)
-		g_ddlCustomGame.Choose(1)
 	}
 }
 
@@ -356,7 +349,7 @@ GuiRadio_Click(GuiCtrlObj, Info)
 
 	switch GuiCtrlObj
 	{
-		; Swap Max Payne and Max Payne 2 in the game directory for convenience
+		; Swap Max Payne and Max Payne 2 in the game directory path for convenience
 		case g_radioMP1:
 			g_bMaxPayne2 := 0
 			g_editGameDir.Text := RegExReplace(g_editGameDir.Text, "i)(.*)Max Payne 2\\$", "$1Max Payne\", , 1)
@@ -371,9 +364,6 @@ GuiRadio_Click(GuiCtrlObj, Info)
 
 	; Refresh the mod list
 	UpdateMods()
-	g_ddlCustomGame.Delete()
-	g_ddlCustomGame.Add(g_arrModFiles)
-	g_ddlCustomGame.Choose(1)
 }
 
 Init()
@@ -382,10 +372,10 @@ Init()
 	ReadWidescreenFixConfigFile()
 	ReadXboxRainDropletsConfigFile()
 
-	UpdateMods()
 	CreateGUI()
 	UpdateGame()
 	CheckGameExe()
+	UpdateMods()
 
 	if (g_bNoGUI)
 		GuiButtonStart_Click()
@@ -592,8 +582,8 @@ UpdateGame()
 	{
 		g_cbUnlockAllChapters.Value := RegRead(g_sGameRegKey "Game Level", "LevelSelector", 0)
 		g_cbUnlockAllDiff.Value := RegRead(g_sGameRegKey "Game Level", "hell", 0) &&
-								RegRead(g_sGameRegKey "Game Level", "nightmare", 0) &&
-								RegRead(g_sGameRegKey "Game Level", "timedmode", 0)
+		                           RegRead(g_sGameRegKey "Game Level", "nightmare", 0) &&
+		                           RegRead(g_sGameRegKey "Game Level", "timedmode", 0)
 	}
 }
 
@@ -618,4 +608,8 @@ UpdateMods()
 		SplitPath(A_LoopFileFullPath, , , , &l_sFileNameNoExt)
 		g_arrModFiles.Push(l_sFileNameNoExt)
 	}
+
+	g_ddlCustomGame.Delete()
+	g_ddlCustomGame.Add(g_arrModFiles)
+	g_ddlCustomGame.Choose(1)
 }
