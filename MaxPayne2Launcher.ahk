@@ -356,15 +356,14 @@ GuiCB_Click(GuiCtrlObj, Info)
 	}
 }
 
-GuiDDL_Change(GuiCtrlObj, Info)
+GuiDDL_Change(*)
 {
-	global
-	g_sModName := g_ddlCustomGame.Text
+	global g_sModName := g_ddlCustomGame.Text
 }
 
 GuiRadio_Click(GuiCtrlObj, Info)
 {
-	global
+	global g_bMaxPayne2, g_sGameDir
 
 	switch GuiCtrlObj
 	{
@@ -632,5 +631,5 @@ UpdateMods()
 
 	g_ddlCustomGame.Delete()
 	g_ddlCustomGame.Add(g_arrModFiles)
-	g_ddlCustomGame.Choose(1)
+	g_ddlCustomGame.Choose(g_sModName)
 }
