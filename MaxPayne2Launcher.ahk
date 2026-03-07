@@ -150,7 +150,7 @@ CreateGUI()
 	if (g_sModName)
 		g_ddlCustomGame.Text := g_sModName
 
-	g_btnStart := g_gui.AddButton("Background1F1F1F Default x195 w" l_nRightWidth, "&Start game")
+	g_btnStart := g_gui.AddButton("Background1F1F1F Default x210 w" l_nRightWidth, "&Start game")
 
 	; Widescreen fix settings
 	if (FileExist(g_sWidescreenFixConfigFile))
@@ -241,6 +241,7 @@ CreateGUI()
 	g_radioMP1.OnEvent(           "Click", GuiRadio_Click)
 	g_radioMP2.OnEvent(           "Click", GuiRadio_Click)
 	g_cbDeveloper.OnEvent(        "Click", GuiCB_Click)
+	g_cbDeveloperKeys.OnEvent(    "Click", GuiCB_Click)
 	g_cbNodialog.OnEvent(         "Click", GuiCB_Click)
 	g_cbShowprogress.OnEvent(     "Click", GuiCB_Click)
 	g_cbUnlockAllChapters.OnEvent("Click", GuiCB_Click)
@@ -326,7 +327,10 @@ GuiCB_Click(GuiCtrlObj, Info)
 	{
 		case g_cbDeveloper:
 			if (!g_cbDeveloper.Value)
-				g_cbShowprogress.Value := false
+				g_cbDeveloperKeys.Value := g_cbShowprogress.Value := false
+		case g_cbDeveloperKeys:
+			if (g_cbDeveloperKeys.Value)
+				g_cbDeveloper.Value := true
 		case g_cbNodialog:
 			if (g_cbNodialog.Value)
 				MsgBox("Using -nodialog will prevent the game from loading mods!", "Warning", 48) 
