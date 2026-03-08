@@ -73,6 +73,7 @@ CreateGui()
 	local l_nRightWidth := 100
 
 	g_tab := g_gui.AddTab3(, ["General"])
+	g_arrTab := ["General"]
 
 	; Game
 	g_gui.AddGroupBox("R2.5 x" l_nLeftX - 4 " y" l_nTopY " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Game")
@@ -120,13 +121,13 @@ CreateGui()
 	g_cbUnlockAllDiff := g_gui.AddCheckbox("x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 5, "Unlock all difficulties")
 
 	l_nCurrentRow++
-	g_tab.UseTab(0)
-	
+
 	; Customized game
 	g_gui.AddGroupBox("R1.5 x" l_nLeftX - 4 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 10 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4,
 	                  "Choose customized game")
 	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 10 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + 5)
 
+	g_tab.UseTab(0)
 	g_btnStart := g_gui.AddButton("Background1F1F1F Default x210 w" l_nRightWidth, "&Start game")
 
 	; Events
@@ -162,87 +163,85 @@ CreateGuiWidescreen()
 	local l_nRightWidth := 100
 
 	; Widescreen fix settings
-	if (FileExist(g_sWidescreenFixConfigFile))
+	g_tab.Add(["Widescreen"])
+	g_arrTab.Push("Widescreen")
+	g_tab.UseTab(2)
+
+	g_gui.AddGroupBox("R11.5 x" l_nLeftX - 4 " y" l_nTopY " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Widescreen fix")
+
+	g_cbAllowAltTabbingWithoutPausing := g_gui.AddCheckbox("Checked" g_bAllowAltTabbingWithoutPausing " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY,
+	                                                       "Allow alt tabbing without pausing")
+	g_cbCutsceneBorders := g_gui.AddCheckbox("Checked" g_bCutsceneBorders - 1 " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Cutscene borders")
+	g_cbD3DHookBorders := g_gui.AddCheckbox("Checked" g_bD3DHookBorders " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "D3D hook borders")
+	g_gui.AddText("vSliderFOVFactorLeft", "FOV factor")
+	g_editFOVFactor := g_gui.AddEdit("vSliderFOVFactorRight CBlack R1 ReadOnly w" 50, g_fFOVFactor)
+	g_sliderFOVFactor := g_gui.AddSlider("AltSubmit Buddy1SliderFOVFactorLeft Buddy2SliderFOVFactorRight NoTicks Range1-20 x" l_nMiddleX
+	                                     " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 2 " w" l_nMiddleWidth + 15, g_fFOVFactor * 10)
+	g_cbGraphicNovelMode := g_gui.AddCheckbox("Checked" g_bGraphicNovelMode " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Graphic novel mode")
+	g_gui.AddText("Right x" l_nLeftX + 10 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY + 5 " w" l_nLeftWidth + 40, "Graphic novel mode key")
+	g_editGraphicNovelModeKey := g_gui.AddEdit("CBlack R1 x" l_nMiddleX + 10 " y" l_nTopY + l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth, g_sGraphicNovelModeKey)
+	g_gui.AddText("Right x" l_nLeftX + 10 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY + 5 " w" l_nLeftWidth + 40, "Load save slot")
+	g_ddlLoadSaveSlot := g_gui.AddDropDownList("Choose" Abs(g_nLoadSaveSlot) " x" l_nMiddleX + 10 " y" l_nTopY + l_nCurrentRow * l_nSpacingY
+	                                           " w" l_nMiddleWidth, ["Disable", "Load last used", "Load most recent"])
+	l_nTopY += 5
+	g_cbUseGameFolderForSavegames := g_gui.AddCheckbox("Checked" g_bUseGameFolderForSavegames " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY,
+	                                                   "Use game folder for savegames")
+	g_cbWidescreenHud := g_gui.AddCheckbox("Checked" g_bWidescreenHud " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Widescreen HUD")
+	g_gui.AddText("vSliderWidescreenHudOffsetLeft", "Widescreen HUD offset")
+	g_editWidescreenHudOffset := g_gui.AddEdit("vSliderWidescreenHudOffsetRight CBlack R1 ReadOnly w" 50, g_fWidescreenHudOffset)
+	g_sliderWidescreenHudOffset := g_gui.AddSlider("AltSubmit Buddy1SliderWidescreenHudOffsetLeft Buddy2SliderWidescreenHudOffsetRight NoTicks Range10-200 x"
+	                                               l_nMiddleX " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_fWidescreenHudOffset)
+
+	; Events
+	g_sliderFOVFactor.OnEvent("Change", (*) => g_editFOVFactor.Text := Round(g_sliderFOVFactor.Value / 10.0, 1))
+	g_sliderWidescreenHudOffset.OnEvent("Change", (*) => g_editWidescreenHudOffset.Text := Float(g_sliderWidescreenHudOffset.Value))
+
+	; Xbox rain droplets settings
+	if (FileExist(g_sXboxRainDropletsConfigFile))
 	{
-		g_tab.Add(["Widescreen"])
-		g_tab.UseTab(2)
+		l_nCurrentRow++
+		g_gui.AddGroupBox("R8.5 x" l_nLeftX - 4 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 5 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4,
+						"Xbox rain droplets")
 
-		g_gui.AddGroupBox("R11.5 x" l_nLeftX - 4 " y" l_nTopY " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Widescreen fix")
+		g_cbEnableGravity := g_gui.AddCheckbox("Checked" g_bEnableGravity " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Enable gravity")
 
-		g_cbAllowAltTabbingWithoutPausing := g_gui.AddCheckbox("Checked" g_bAllowAltTabbingWithoutPausing " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY,
-		                                                       "Allow alt tabbing without pausing")
-		g_cbCutsceneBorders := g_gui.AddCheckbox("Checked" g_bCutsceneBorders - 1 " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Cutscene borders")
-		g_cbD3DHookBorders := g_gui.AddCheckbox("Checked" g_bD3DHookBorders " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "D3D hook borders")
-		g_gui.AddText("vSliderFOVFactorLeft", "FOV factor")
-		g_editFOVFactor := g_gui.AddEdit("vSliderFOVFactorRight CBlack R1 ReadOnly w" 50, g_fFOVFactor)
-		g_sliderFOVFactor := g_gui.AddSlider("AltSubmit Buddy1SliderFOVFactorLeft Buddy2SliderFOVFactorRight NoTicks Range1-20 x" l_nMiddleX
-		                                     " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 2 " w" l_nMiddleWidth + 15, g_fFOVFactor * 10)
-		g_cbGraphicNovelMode := g_gui.AddCheckbox("Checked" g_bGraphicNovelMode " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Graphic novel mode")
-		g_gui.AddText("Right x" l_nLeftX + 10 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY + 5 " w" l_nLeftWidth + 40, "Graphic novel mode key")
-		g_editGraphicNovelModeKey := g_gui.AddEdit("CBlack R1 x" l_nMiddleX + 10 " y" l_nTopY + l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth, g_sGraphicNovelModeKey)
-		g_gui.AddText("Right x" l_nLeftX + 10 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY + 5 " w" l_nLeftWidth + 40, "Load save slot")
-		g_ddlLoadSaveSlot := g_gui.AddDropDownList("Choose" Abs(g_nLoadSaveSlot) " x" l_nMiddleX + 10 " y" l_nTopY + l_nCurrentRow * l_nSpacingY
-	                                               " w" l_nMiddleWidth, ["Disable", "Load last used", "Load most recent"])
-		l_nTopY += 5
-		g_cbUseGameFolderForSavegames := g_gui.AddCheckbox("Checked" g_bUseGameFolderForSavegames " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY,
-		                                                   "Use game folder for savegames")
-		g_cbWidescreenHud := g_gui.AddCheckbox("Checked" g_bWidescreenHud " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Widescreen HUD")
-		g_gui.AddText("vSliderWidescreenHudOffsetLeft", "Widescreen HUD offset")
-		g_editWidescreenHudOffset := g_gui.AddEdit("vSliderWidescreenHudOffsetRight CBlack R1 ReadOnly w" 50, g_fWidescreenHudOffset)
-		g_sliderWidescreenHudOffset := g_gui.AddSlider("AltSubmit Buddy1SliderWidescreenHudOffsetLeft Buddy2SliderWidescreenHudOffsetRight NoTicks Range10-200 x"
-		                                               l_nMiddleX " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_fWidescreenHudOffset)
+		g_gui.AddText("vSliderMinSizeLeft", "Mininum size")
+		g_editMinSize := g_gui.AddEdit("vSliderMinSizeRight CBlack R1 ReadOnly w" 50, g_nMinSize)
+		g_sliderMinSize := g_gui.AddSlider("AltSubmit Buddy1SliderMinSizeLeft Buddy2SliderMinSizeRight NoTicks Range1-9 x" l_nMiddleX
+										" y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_nMinSize)
+
+		g_gui.AddText("vSliderMaxDropsLeft", "Maximum drops")
+		g_editMaxDrops := g_gui.AddEdit("vSliderMaxDropsRight CBlack R1 ReadOnly w" 50, g_nMaxDrops)
+		g_sliderMaxDrops := g_gui.AddSlider("AltSubmit Buddy1SliderMaxDropsLeft Buddy2SliderMaxDropsRight NoTicks Range1000-10000 x" l_nMiddleX
+											" y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_nMaxDrops)
+
+		g_gui.AddText("vSliderMaxMovingDropsLeft", "Maximum moving drops")
+		g_editMaxMovingDrops := g_gui.AddEdit("vSliderMaxMovingDropsRight CBlack R1 ReadOnly w" 50, g_nMaxMovingDrops)
+		g_sliderMaxMovingDrops := g_gui.AddSlider("AltSubmit Buddy1SliderMaxMovingDropsLeft Buddy2SliderMaxMovingDropsRight NoTicks Range1000-10000 x" l_nMiddleX
+												" y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_nMaxMovingDrops)
+
+		g_gui.AddText("vSliderMaxSizeLeft", "Maximum size")
+		g_editMaxSize := g_gui.AddEdit("vSliderMaxSizeRight CBlack R1 ReadOnly w" 50, g_nMaxSize)
+		g_sliderMaxSize := g_gui.AddSlider("AltSubmit Buddy1SliderMaxSizeLeft Buddy2SliderMaxSizeRight NoTicks Range10-30 x" l_nMiddleX
+										" y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_nMaxSize)
+
+		g_gui.AddText("vSliderMoveStepLeft", "Move step")
+		g_editMoveStep := g_gui.AddEdit("vSliderMoveStepRight CBlack R1 ReadOnly w" 50, g_fMoveStep)
+		g_sliderMoveStep := g_gui.AddSlider("AltSubmit Buddy1SliderMoveStepLeft Buddy2SliderMoveStepRight NoTicks Range1-20 x" l_nMiddleX
+											" y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_fMoveStep * 10)
+
+		g_gui.AddText("vSliderSpeedAdjusterLeft", "Speed adjuster")
+		g_editSpeedAdjuster := g_gui.AddEdit("vSliderSpeedAdjusterRight CBlack R1 ReadOnly w" 50, g_fSpeedAdjuster)
+		g_sliderSpeedAdjuster := g_gui.AddSlider("AltSubmit Buddy1SliderSpeedAdjusterLeft Buddy2SliderSpeedAdjusterRight NoTicks Range1-20 x" l_nMiddleX
+												" y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_fSpeedAdjuster * 10)
 
 		; Events
-		g_sliderFOVFactor.OnEvent("Change", (*) => g_editFOVFactor.Text := Round(g_sliderFOVFactor.Value / 10.0, 1))
-		g_sliderWidescreenHudOffset.OnEvent("Change", (*) => g_editWidescreenHudOffset.Text := Float(g_sliderWidescreenHudOffset.Value))
-
-		; Xbox rain droplets settings
-		if (FileExist(g_sXboxRainDropletsConfigFile))
-		{
-			l_nCurrentRow++
-			g_gui.AddGroupBox("R8.5 x" l_nLeftX - 4 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 5 " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4,
-			                  "Xbox rain droplets")
-
-			g_cbEnableGravity := g_gui.AddCheckbox("Checked" g_bEnableGravity " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Enable gravity")
-
-			g_gui.AddText("vSliderMinSizeLeft", "Mininum size")
-			g_editMinSize := g_gui.AddEdit("vSliderMinSizeRight CBlack R1 ReadOnly w" 50, g_nMinSize)
-			g_sliderMinSize := g_gui.AddSlider("AltSubmit Buddy1SliderMinSizeLeft Buddy2SliderMinSizeRight NoTicks Range1-9 x" l_nMiddleX
-			                                   " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_nMinSize)
-
-			g_gui.AddText("vSliderMaxDropsLeft", "Maximum drops")
-			g_editMaxDrops := g_gui.AddEdit("vSliderMaxDropsRight CBlack R1 ReadOnly w" 50, g_nMaxDrops)
-			g_sliderMaxDrops := g_gui.AddSlider("AltSubmit Buddy1SliderMaxDropsLeft Buddy2SliderMaxDropsRight NoTicks Range1000-10000 x" l_nMiddleX
-			                                    " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_nMaxDrops)
-
-			g_gui.AddText("vSliderMaxMovingDropsLeft", "Maximum moving drops")
-			g_editMaxMovingDrops := g_gui.AddEdit("vSliderMaxMovingDropsRight CBlack R1 ReadOnly w" 50, g_nMaxMovingDrops)
-			g_sliderMaxMovingDrops := g_gui.AddSlider("AltSubmit Buddy1SliderMaxMovingDropsLeft Buddy2SliderMaxMovingDropsRight NoTicks Range1000-10000 x" l_nMiddleX
-			                                          " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_nMaxMovingDrops)
-
-			g_gui.AddText("vSliderMaxSizeLeft", "Maximum size")
-			g_editMaxSize := g_gui.AddEdit("vSliderMaxSizeRight CBlack R1 ReadOnly w" 50, g_nMaxSize)
-			g_sliderMaxSize := g_gui.AddSlider("AltSubmit Buddy1SliderMaxSizeLeft Buddy2SliderMaxSizeRight NoTicks Range10-30 x" l_nMiddleX
-			                                   " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_nMaxSize)
-
-			g_gui.AddText("vSliderMoveStepLeft", "Move step")
-			g_editMoveStep := g_gui.AddEdit("vSliderMoveStepRight CBlack R1 ReadOnly w" 50, g_fMoveStep)
-			g_sliderMoveStep := g_gui.AddSlider("AltSubmit Buddy1SliderMoveStepLeft Buddy2SliderMoveStepRight NoTicks Range1-20 x" l_nMiddleX
-			                                    " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_fMoveStep * 10)
-
-			g_gui.AddText("vSliderSpeedAdjusterLeft", "Speed adjuster")
-			g_editSpeedAdjuster := g_gui.AddEdit("vSliderSpeedAdjusterRight CBlack R1 ReadOnly w" 50, g_fSpeedAdjuster)
-			g_sliderSpeedAdjuster := g_gui.AddSlider("AltSubmit Buddy1SliderSpeedAdjusterLeft Buddy2SliderSpeedAdjusterRight NoTicks Range1-20 x" l_nMiddleX
-			                                         " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_fSpeedAdjuster * 10)
-
-			; Events
-			g_sliderMinSize.OnEvent("Change", (*) => g_editMinSize.Text := g_sliderMinSize.Value)
-			g_sliderMaxSize.OnEvent("Change", (*) => g_editMaxSize.Text := g_sliderMaxSize.Value)
-			g_sliderMaxDrops.OnEvent("Change", (*) => g_editMaxDrops.Text := g_sliderMaxDrops.Value)
-			g_sliderMaxMovingDrops.OnEvent("Change", (*) => g_editMaxMovingDrops.Text := g_sliderMaxMovingDrops.Value)
-			g_sliderMoveStep.OnEvent("Change", (*) => g_editMoveStep.Text := Round(g_sliderMoveStep.Value / 10.0, 1))
-			g_sliderSpeedAdjuster.OnEvent("Change", (*) => g_editSpeedAdjuster.Text := Round(g_sliderSpeedAdjuster.Value / 10.0, 1))
-		}
+		g_sliderMinSize.OnEvent("Change", (*) => g_editMinSize.Text := g_sliderMinSize.Value)
+		g_sliderMaxSize.OnEvent("Change", (*) => g_editMaxSize.Text := g_sliderMaxSize.Value)
+		g_sliderMaxDrops.OnEvent("Change", (*) => g_editMaxDrops.Text := g_sliderMaxDrops.Value)
+		g_sliderMaxMovingDrops.OnEvent("Change", (*) => g_editMaxMovingDrops.Text := g_sliderMaxMovingDrops.Value)
+		g_sliderMoveStep.OnEvent("Change", (*) => g_editMoveStep.Text := Round(g_sliderMoveStep.Value / 10.0, 1))
+		g_sliderSpeedAdjuster.OnEvent("Change", (*) => g_editSpeedAdjuster.Text := Round(g_sliderSpeedAdjuster.Value / 10.0, 1))
 	}
 }
 
@@ -266,6 +265,10 @@ GuiButtonBrowse_Click(*)
 
 		; Refresh the mod list
 		UpdateMods()
+
+		ReadWidescreenFixConfigFile()
+		ReadXboxRainDropletsConfigFile()
+		GuiUpdateWidescreen()
 	}
 }
 
@@ -285,7 +288,7 @@ GuiButtonStart_Click(*)
 		WinActivate(g_sWinTitleGame)
 		return
 	}
-	; Otherwise start the launcher
+	; Otherwise start the launcher with arguments
 	else
 	{
 		if (!CheckGameExe())
@@ -363,6 +366,58 @@ GuiRadio_Click(GuiCtrlObj, Info)
 
 	; Refresh the mod list
 	UpdateMods()
+
+	ReadWidescreenFixConfigFile()
+	ReadXboxRainDropletsConfigFile()
+	GuiUpdateWidescreen()
+}
+
+GuiUpdateWidescreen()
+{
+	global g_sWidescreenFixConfigFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".WidescreenFix.ini"
+	global g_sXboxRainDropletsConfigFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".XboxRainDroplets.ini"
+
+	if (FileExist(g_sWidescreenFixConfigFile))
+	{
+		; Add the widescreen tab if it's missing
+		if (g_arrTab.Length < 2)
+		{
+			g_tab.Add(["Widescreen"])
+			g_arrTab.Push("Widescreen")
+		}
+
+		g_cbAllowAltTabbingWithoutPausing.Value := g_bAllowAltTabbingWithoutPausing
+		g_cbCutsceneBorders.Value := g_bCutsceneBorders
+		g_cbD3DHookBorders.Value := g_bD3DHookBorders
+		g_editFOVFactor.Text := g_fFOVFactor
+		g_sliderFOVFactor.Value := g_fFOVFactor * 10
+		g_cbGraphicNovelMode.Value := g_bGraphicNovelMode
+		g_editGraphicNovelModeKey.Value := g_sGraphicNovelModeKey
+		g_ddlLoadSaveSlot.Value := Abs(g_nLoadSaveSlot)
+		g_cbUseGameFolderForSavegames.Value := g_bUseGameFolderForSavegames
+		g_cbWidescreenHud.Value := g_bWidescreenHud
+		g_sliderWidescreenHudOffset.Value := g_editWidescreenHudOffset.Value := g_fWidescreenHudOffset
+
+		if (FileExist(g_sXboxRainDropletsConfigFile))
+		{
+			g_cbEnableGravity.Value := g_bEnableGravity
+			g_sliderMinSize.Value := g_editMinSize.Text := g_nMinSize
+			g_sliderMaxDrops.Value := g_editMaxDrops.Text := g_nMaxDrops
+			g_sliderMaxMovingDrops.Value := g_editMaxMovingDrops.Text := g_nMaxMovingDrops
+			g_sliderMaxSize.Value := g_editMaxSize.Text := g_nMaxSize
+			g_editMoveStep.Text := g_fMoveStep
+			g_sliderMoveStep.Value := g_fMoveStep * 10
+			g_editSpeedAdjuster.Text := g_fSpeedAdjuster
+			g_sliderSpeedAdjuster.Value := g_fSpeedAdjuster * 10
+		}
+	}
+	; Delete the widescreen tab if it's no longer necessary
+	else if (g_arrTab.Length > 1)
+	{
+		g_tab.Delete(2)
+		g_tab.Redraw()
+		g_arrTab.Pop()
+	}
 }
 
 Init()
@@ -380,6 +435,7 @@ Init()
 		ReadWidescreenFixConfigFile()
 		ReadXboxRainDropletsConfigFile()
 		CreateGuiWidescreen()
+		GuiUpdateWidescreen()
 		g_gui.Show()
 	}
 }
@@ -415,51 +471,45 @@ ReadWidescreenFixConfigFile()
 	global
 	g_sWidescreenFixConfigFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".WidescreenFix.ini"
 
-	if (!g_bNoGUI && FileExist(g_sWidescreenFixConfigFile))
-	{
-		; The widescreen fix INI includes unorthodox // comments so we need to preserve and trim them
-		g_arrWidescreenHud                 := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "WidescreenHud", true), "//", 2)
-		g_arrWidescreenHudOffset           := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "WidescreenHudOffset", 100.0), "//", 2)
-		g_arrFOVFactor                     := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "FOVFactor", 1.0), "//", 2)
-		g_arrGraphicNovelMode              := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "GraphicNovelMode", true), "//", 2)
-		g_arrGraphicNovelModeKey           := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "GraphicNovelModeKey", 0x71), "//", 2)
-		g_arrCutsceneBorders               := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "CutsceneBorders", 2), "//", 2)
-		g_arrD3DHookBorders                := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "D3DHookBorders", true), "//", 2)
-		g_arrLoadSaveSlot                  := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MISC", "LoadSaveSlot", -1), "//", 2)
-		g_arrUseGameFolderForSavegames     := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MISC", "UseGameFolderForSavegames", false), "//", 2)
-		g_arrAllowAltTabbingWithoutPausing := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MISC", "AllowAltTabbingWithoutPausing", true), "//", 2)
+	; The widescreen fix INI includes unorthodox // comments so we need to preserve and trim them
+	g_arrWidescreenHud                 := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "WidescreenHud", true), "//", 2)
+	g_arrWidescreenHudOffset           := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "WidescreenHudOffset", 100.0), "//", 2)
+	g_arrFOVFactor                     := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "FOVFactor", 1.0), "//", 2)
+	g_arrGraphicNovelMode              := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "GraphicNovelMode", true), "//", 2)
+	g_arrGraphicNovelModeKey           := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "GraphicNovelModeKey", 0x71), "//", 2)
+	g_arrCutsceneBorders               := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "CutsceneBorders", 2), "//", 2)
+	g_arrD3DHookBorders                := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MAIN", "D3DHookBorders", true), "//", 2)
+	g_arrLoadSaveSlot                  := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MISC", "LoadSaveSlot", -1), "//", 2)
+	g_arrUseGameFolderForSavegames     := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MISC", "UseGameFolderForSavegames", false), "//", 2)
+	g_arrAllowAltTabbingWithoutPausing := StrSplit(IniRead(g_sWidescreenFixConfigFile, "MISC", "AllowAltTabbingWithoutPausing", true), "//", 2)
 
-		; Main
-		g_bWidescreenHud                   := Trim(g_arrWidescreenHud[1]) == true
-		g_fWidescreenHudOffset             := Trim(g_arrWidescreenHudOffset[1])
-		g_fFOVFactor                       := Trim(g_arrFOVFactor[1])
-		g_bGraphicNovelMode                := Trim(g_arrGraphicNovelMode[1]) == true
-		g_sGraphicNovelModeKey             := Trim(g_arrGraphicNovelModeKey[1])
-		g_bCutsceneBorders                 := Trim(g_arrCutsceneBorders[1]) == 2
-		g_bD3DHookBorders                  := Trim(g_arrD3DHookBorders[1]) == true
+	; Main
+	g_bWidescreenHud                   := Trim(g_arrWidescreenHud[1]) == true
+	g_fWidescreenHudOffset             := Trim(g_arrWidescreenHudOffset[1])
+	g_fFOVFactor                       := Trim(g_arrFOVFactor[1])
+	g_bGraphicNovelMode                := Trim(g_arrGraphicNovelMode[1]) == true
+	g_sGraphicNovelModeKey             := Trim(g_arrGraphicNovelModeKey[1])
+	g_bCutsceneBorders                 := Trim(g_arrCutsceneBorders[1]) == 2
+	g_bD3DHookBorders                  := Trim(g_arrD3DHookBorders[1]) == true
 
-		; Misc
-		g_nLoadSaveSlot                    := Trim(g_arrLoadSaveSlot[1])
-		g_bUseGameFolderForSavegames       := Trim(g_arrUseGameFolderForSavegames[1]) == true
-		g_bAllowAltTabbingWithoutPausing   := Trim(g_arrAllowAltTabbingWithoutPausing[1]) == true
-	}
+	; Misc
+	g_nLoadSaveSlot                    := Trim(g_arrLoadSaveSlot[1])
+	g_bUseGameFolderForSavegames       := Trim(g_arrUseGameFolderForSavegames[1]) == true
+	g_bAllowAltTabbingWithoutPausing   := Trim(g_arrAllowAltTabbingWithoutPausing[1]) == true
 }
 
 ReadXboxRainDropletsConfigFile()
 {
 	global
-	g_sXboxRainDropletsConfigFile := g_sGameDir "scripts\MaxPayne2.XboxRainDroplets.ini"
+	g_sXboxRainDropletsConfigFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".XboxRainDroplets.ini"
 
-	if (!g_bNoGUI && FileExist(g_sXboxRainDropletsConfigFile))
-	{
-		g_nMinSize        := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "MinSize", 4)
-		g_nMaxSize        := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "MaxSize", 15)
-		g_nMaxDrops       := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "MaxDrops", 3000)
-		g_nMaxMovingDrops := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "MaxMovingDrops", 6000)
-		g_bEnableGravity  := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "EnableGravity", true) == true
-		g_fSpeedAdjuster  := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "SpeedAdjuster", 1.0)
-		g_fMoveStep       := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "MoveStep", 0.1)
-	}
+	g_nMinSize        := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "MinSize", 4)
+	g_nMaxSize        := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "MaxSize", 15)
+	g_nMaxDrops       := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "MaxDrops", 3000)
+	g_nMaxMovingDrops := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "MaxMovingDrops", 6000)
+	g_bEnableGravity  := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "EnableGravity", true) == true
+	g_fSpeedAdjuster  := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "SpeedAdjuster", 1.0)
+	g_fMoveStep       := IniRead(g_sXboxRainDropletsConfigFile, "MAIN", "MoveStep", 0.1)
 }
 
 SaveSettings()
@@ -509,9 +559,7 @@ SaveSettings()
 
 SaveWidescreenFixSettings()
 {
-	global g_sWidescreenFixConfigFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".WidescreenFix.ini"
-
-	if (!g_bNoGUI && FileExist(g_sWidescreenFixConfigFile))
+	if (!g_bNoGUI && g_arrTab.Length > 1 && FileExist(g_sWidescreenFixConfigFile))
 	{
 		try
 		{
@@ -544,10 +592,7 @@ SaveWidescreenFixSettings()
 
 SaveXboxRainDropletsSettings()
 {
-	global
-	g_sXboxRainDropletsConfigFile := g_sGameDir "scripts\MaxPayne2.XboxRainDroplets.ini"
-
-	if (!g_bNoGUI && FileExist(g_sXboxRainDropletsConfigFile))
+	if (!g_bNoGUI && g_arrTab.Length > 1 && FileExist(g_sXboxRainDropletsConfigFile))
 	{
 		try
 		{
@@ -568,14 +613,13 @@ SaveXboxRainDropletsSettings()
 UpdateGame()
 {
 	global
+	local l_sLink := "https://www.pcgamingwiki.com/wiki/Max_Payne" (g_bMaxPayne2 ? "_2:_The_Fall_of_Max_Payne" : "") "#Command_line_arguments"
 
 	g_sGameExe := "MaxPayne" (g_bMaxPayne2 ? "2" : "") ".exe"
 	g_sGameRegKey := "HKEY_CURRENT_USER\Software\Remedy Entertainment\Max Payne" (g_bMaxPayne2 ? " 2\" : "\")
 	g_sWinTitleGame := "ahk_exe " g_sGameExe " ahk_class MaxPayne" (g_bMaxPayne2 ? "2" : "")
 	g_sWinTitleSplash := "ahk_exe " g_sGameExe " ahk_class #32770"
-	g_sLink := g_bMaxPayne2 ? "https://www.pcgamingwiki.com/wiki/Max_Payne_2:_The_Fall_of_Max_Payne#Command_line_arguments"
-	                        : "https://www.pcgamingwiki.com/wiki/Max_Payne#Command_line_arguments"
-	g_linkPCGW.Text := 'See this <a href="' g_sLink '">link</a> for more details.'
+	g_linkPCGW.Text := 'See this <a href="' l_sLink '">link</a> for more details.'
 	g_radioMP2.Value := g_bMaxPayne2
 	g_radioMP1.Value := !g_radioMP2.Value
 
