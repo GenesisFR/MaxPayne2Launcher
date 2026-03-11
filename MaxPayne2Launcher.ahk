@@ -2,9 +2,6 @@
 #SingleInstance force     ; Allow only a single instance of the script to run.
 #Warn                     ; Enable warnings to assist with detecting common errors.
 
-;TODO
-; clamp variables within allowed ranges when reading config files
-
 ; Do not edit this
 g_sConfigFile := A_ScriptDir "\MaxPayne2Launcher.ini"
 
@@ -48,6 +45,20 @@ CheckGameExe()
 	}
 
 	return true
+}
+
+ClampType(p_sValue, p_sDefault, p_sType, p_nMin := 0, p_nMax := 0)
+{
+	try
+	{
+		l_nValue := p_sValue + (p_sType == "int" ? 0 : 0.0)
+	}
+	catch TypeError ; not an integer/float
+	{
+		return p_sDefault
+	}
+
+	return (l_nValue >= p_nMin && l_nValue <= p_nMax) ? l_nValue : p_sDefault
 }
 
 CreateGui()
@@ -471,6 +482,9 @@ ReadConfigFile()
 	g_bWindow            := IniRead(g_sConfigFile, "General", "bWindow", false) == true
 	g_bNoGUI             := IniRead(g_sConfigFile, "General", "bNoGUI", false) == true
 
+	; Clamping remaining variables
+	g_nWidth := ClampType(g_nWidth, 2560, "int", 640, 10000)
+	g_nHeight := ClampType(g_nHeight, 1440, "int", 480, 10000)
 	g_sResolution := g_nWidth " x " g_nHeight " x 32"
 }
 
@@ -505,6 +519,11 @@ ReadWidescreenFixConfigFile()
 	g_nLoadSaveSlot                    := Trim(g_arrLoadSaveSlot[1])
 	g_bUseGameFolderForSavegames       := Trim(g_arrUseGameFolderForSavegames[1]) == true
 	g_bAllowAltTabbingWithoutPausing   := Trim(g_arrAllowAltTabbingWithoutPausing[1]) == true
+
+	; Clamping remaining variables
+	g_fWidescreenHudOffset := ClampType(g_fWidescreenHudOffset, 100.0, "float", 10.0, 200.0)
+	g_fFOVFactor := ClampType(g_fFOVFactor, 1.0, "float", 0.1, 2.0)
+	g_nLoadSaveSlot := ClampType(g_nLoadSaveSlot, -1, "int", -3, -1)
 }
 
 ReadXboxRainDropletsConfigFile()
@@ -520,6 +539,14 @@ ReadXboxRainDropletsConfigFile()
 	g_bEnableGravity  := IniRead(g_sXboxCfgFile, "MAIN", "EnableGravity", true) == true
 	g_fSpeedAdjuster  := IniRead(g_sXboxCfgFile, "MAIN", "SpeedAdjuster", 1.0)
 	g_fMoveStep       := IniRead(g_sXboxCfgFile, "MAIN", "MoveStep", 0.1)
+
+	; Clamping remaining variables
+	g_nMinSize := ClampType(g_nMinSize, 4, "int", 1, 9)
+	g_nMaxSize := ClampType(g_nMaxSize, 15, "int", 10, 30)
+	g_nMaxDrops := ClampType(g_nMaxDrops, 3000, "int", 1000, 10000)
+	g_nMaxMovingDrops := ClampType(g_nMaxMovingDrops, 6000, "int", 1000, 10000)
+	g_fSpeedAdjuster := ClampType(g_fSpeedAdjuster, 1.0, "float", 0.1, 2.0)
+	g_fMoveStep := ClampType(g_fMoveStep, 0.1, "float", 0.1, 2.0)
 }
 
 SaveSettings()
