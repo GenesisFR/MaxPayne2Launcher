@@ -58,15 +58,13 @@ ClampType(p_sValue, p_sDefault, p_sType, p_nMin := 0, p_nMax := 0)
 		return p_sDefault
 	}
 
-	if (l_nValue >= p_nMin && l_nValue <= p_nMax)
-	{
-		if (p_sType == "float")
-			l_nValue := Round(l_nValue, 1)
+	l_nValue := Min(l_nValue, p_nMax)
+	l_nValue := Max(l_nValue, p_nMin)
 
-		return l_nValue
-	}
-	else
-		return p_sDefault
+	if (p_sType == "float")
+		l_nValue := Round(l_nValue, 1)
+
+	return l_nValue
 }
 
 CreateGui()
@@ -503,16 +501,16 @@ ReadWidescreenFixConfigFile()
 	g_sWidescreenCfgFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".WidescreenFix.ini"
 
 	; The widescreen fix INI includes non-standard // comments so we need to preserve and trim them
-	g_arrWidescreenHud                 := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "WidescreenHud", true), "//", 2)
-	g_arrWidescreenHudOffset           := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "WidescreenHudOffset", 100.0), "//", 2)
-	g_arrFOVFactor                     := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "FOVFactor", 1.0), "//", 2)
-	g_arrGraphicNovelMode              := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "GraphicNovelMode", true), "//", 2)
-	g_arrGraphicNovelModeKey           := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "GraphicNovelModeKey", 0x71), "//", 2)
-	g_arrCutsceneBorders               := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "CutsceneBorders", 2), "//", 2)
-	g_arrD3DHookBorders                := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "D3DHookBorders", true), "//", 2)
-	g_arrLoadSaveSlot                  := StrSplit(IniRead(g_sWidescreenCfgFile, "MISC", "LoadSaveSlot", -1), "//", 2)
-	g_arrUseGameFolderForSavegames     := StrSplit(IniRead(g_sWidescreenCfgFile, "MISC", "UseGameFolderForSavegames", false), "//", 2)
-	g_arrAllowAltTabbingWithoutPausing := StrSplit(IniRead(g_sWidescreenCfgFile, "MISC", "AllowAltTabbingWithoutPausing", true), "//", 2)
+	g_arrWidescreenHud                 := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "WidescreenHud", true), "//", , 2)
+	g_arrWidescreenHudOffset           := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "WidescreenHudOffset", 100.0), "//", , 2)
+	g_arrFOVFactor                     := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "FOVFactor", 1.0), "//", , 2)
+	g_arrGraphicNovelMode              := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "GraphicNovelMode", true), "//", , 2)
+	g_arrGraphicNovelModeKey           := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "GraphicNovelModeKey", 0x71), "//", , 2)
+	g_arrCutsceneBorders               := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "CutsceneBorders", 2), "//", , 2)
+	g_arrD3DHookBorders                := StrSplit(IniRead(g_sWidescreenCfgFile, "MAIN", "D3DHookBorders", true), "//", , 2)
+	g_arrLoadSaveSlot                  := StrSplit(IniRead(g_sWidescreenCfgFile, "MISC", "LoadSaveSlot", -1), "//", , 2)
+	g_arrUseGameFolderForSavegames     := StrSplit(IniRead(g_sWidescreenCfgFile, "MISC", "UseGameFolderForSavegames", false), "//", , 2)
+	g_arrAllowAltTabbingWithoutPausing := StrSplit(IniRead(g_sWidescreenCfgFile, "MISC", "AllowAltTabbingWithoutPausing", true), "//", , 2)
 
 	; Main
 	g_bWidescreenHud                   := Trim(g_arrWidescreenHud[1]) == true
