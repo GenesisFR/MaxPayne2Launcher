@@ -58,7 +58,15 @@ ClampType(p_sValue, p_sDefault, p_sType, p_nMin := 0, p_nMax := 0)
 		return p_sDefault
 	}
 
-	return (l_nValue >= p_nMin && l_nValue <= p_nMax) ? l_nValue : p_sDefault
+	if (l_nValue >= p_nMin && l_nValue <= p_nMax)
+	{
+		if (p_sType == "float")
+			l_nValue := Round(l_nValue, 1)
+
+		return l_nValue
+	}
+	else
+		return p_sDefault
 }
 
 CreateGui()
