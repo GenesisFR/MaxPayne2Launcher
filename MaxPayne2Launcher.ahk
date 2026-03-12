@@ -51,20 +51,20 @@ ClampType(p_sValue, p_sDefault, p_sType, p_nMin := 0, p_nMax := 0)
 {
 	try
 	{
-		l_nValue := p_sValue + (p_sType == "int" ? 0 : 0.0)
+		l_iValue := p_sValue + (p_sType == "int" ? 0 : 0.0)
 	}
 	catch TypeError ; not an integer/float
 	{
 		return p_sDefault
 	}
 
-	l_nValue := Min(l_nValue, p_nMax)
-	l_nValue := Max(l_nValue, p_nMin)
+	l_iValue := Min(l_iValue, p_nMax)
+	l_iValue := Max(l_iValue, p_nMin)
 
 	if (p_sType == "float")
-		l_nValue := Round(l_nValue, 1)
+		l_iValue := Round(l_iValue, 1)
 
-	return l_nValue
+	return l_iValue
 }
 
 CreateGui()
@@ -76,72 +76,72 @@ CreateGui()
 	g_gui.SetFont("CWhite s10")
 
 	; Layout constants
-	local l_nCurrentRow := 0
-	local l_nSpacingX := 10
-	local l_nSpacingY := 25
-	local l_nTopY := 35
+	local l_iCurrentRow := 0
+	local l_iSpacingX := 10
+	local l_iSpacingY := 25
+	local l_iTopY := 35
 	; Leftmost controls
-	local l_nLeftWidth := 150
-	local l_nLeftX := 35
+	local l_iLeftWidth := 150
+	local l_iLeftX := 35
 	; Middle controls
-	local l_nMiddleWidth := 200
-	local l_nMiddleX := l_nLeftX + l_nLeftWidth + l_nSpacingX
+	local l_iMiddleWidth := 200
+	local l_iMiddleX := l_iLeftX + l_iLeftWidth + l_iSpacingX
 	; Rightmost controls
-	local l_nRightWidth := 100
-	local l_nRightX := l_nMiddleX + l_nMiddleWidth + l_nSpacingX
+	local l_iRightWidth := 100
+	local l_iRightX := l_iMiddleX + l_iMiddleWidth + l_iSpacingX
 
 	g_tabs := g_gui.AddTab3(, ["General"])
 	g_arrTabs := ["General"]
 
 	; Game
-	g_gui.AddGroupBox("h" l_nSpacingY * 3.5 " x" l_nLeftX - 7 " y" l_nTopY " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Game")
-	g_gui.AddText("Right x" l_nLeftX " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nLeftWidth, "Choose your game")
-	g_radioMP1 := g_gui.AddRadio("Checked" (g_bMaxPayne2 ? "0" : "1") " x" l_nMiddleX " y" l_nTopY + l_nCurrentRow * l_nSpacingY, "Max Payne")
-	g_radioMP2 := g_gui.AddRadio("Checked" g_bMaxPayne2 " x" l_nMiddleX + 100 " y" l_nTopY + l_nCurrentRow * l_nSpacingY, "Max Payne 2")
-	g_gui.AddButton("Background1F1F1F Default x" l_nRightX " y" l_nTopY + l_nCurrentRow++ * l_nSpacingY - 7 " w" l_nRightWidth, "&Browse").OnEvent("Click",
+	g_gui.AddGroupBox("h" l_iSpacingY * 3.5 " x" l_iLeftX - 7 " y" l_iTopY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4, "Game")
+	g_gui.AddText("Right x" l_iLeftX " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth, "Choose your game")
+	g_radioMP1 := g_gui.AddRadio("Checked" (g_bMaxPayne2 ? "0" : "1") " x" l_iMiddleX " y" l_iTopY + l_iCurrentRow * l_iSpacingY, "Max Payne")
+	g_radioMP2 := g_gui.AddRadio("Checked" g_bMaxPayne2 " x" l_iMiddleX + 100 " y" l_iTopY + l_iCurrentRow * l_iSpacingY, "Max Payne 2")
+	g_gui.AddButton("Background1F1F1F Default x" l_iRightX " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY - 7 " w" l_iRightWidth, "&Browse").OnEvent("Click",
 	                GuiButtonBrowse_Click)
 
-	g_gui.AddText("Right x" l_nLeftX " y" l_nTopY + l_nCurrentRow * l_nSpacingY + 5 " w" l_nLeftWidth, "Game directory")
-	g_editGameDir := g_gui.AddEdit("CBlack R1 ReadOnly x" l_nMiddleX " y" l_nTopY + l_nCurrentRow++ * l_nSpacingY " w" l_nMiddleWidth + l_nRightWidth + l_nSpacingX - 2,
+	g_gui.AddText("Right x" l_iLeftX " y" l_iTopY + l_iCurrentRow * l_iSpacingY + 5 " w" l_iLeftWidth, "Game directory")
+	g_editGameDir := g_gui.AddEdit("CBlack R1 ReadOnly x" l_iMiddleX " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY " w" l_iMiddleWidth + l_iRightWidth + l_iSpacingX - 2,
 	                               g_sGameDir)
 
 	; Resolution
-	l_nTopY += l_nSpacingY - 3
-	g_gui.AddGroupBox("h" l_nSpacingY * 2.6 " x" l_nLeftX - 7 " y" l_nTopY + l_nSpacingY * l_nCurrentRow " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Resolution")
-	g_gui.AddText("Right x" l_nLeftX " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY + 5 " w" l_nLeftWidth, "Choose your resolution")
-	g_ddlResolution := g_gui.AddDropDownList(" x" l_nMiddleX " y" l_nTopY + l_nCurrentRow++ * l_nSpacingY " w" l_nMiddleWidth, GetResolutionList())
+	l_iTopY += l_iSpacingY - 3
+	g_gui.AddGroupBox("h" l_iSpacingY * 2.6 " x" l_iLeftX - 7 " y" l_iTopY + l_iSpacingY * l_iCurrentRow " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4, "Resolution")
+	g_gui.AddText("Right x" l_iLeftX " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY + 5 " w" l_iLeftWidth, "Choose your resolution")
+	g_ddlResolution := g_gui.AddDropDownList(" x" l_iMiddleX " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY " w" l_iMiddleWidth, GetResolutionList())
 	g_ddlResolution.Text := g_sResolution
 
 	; Launch parameters
-	l_nTopY += l_nSpacingY
-	g_gui.AddGroupBox("h" l_nSpacingY * 12.1 " x" l_nLeftX - 7 " y" l_nTopY + l_nCurrentRow * l_nSpacingY " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4,
+	l_iTopY += l_iSpacingY
+	g_gui.AddGroupBox("h" l_iSpacingY * 12.1 " x" l_iLeftX - 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4,
 	                  "Launch parameters")
-	g_linkPCGW := g_gui.AddLink("x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "See this link for more details.")
-	g_cbDeveloper := g_gui.AddCheckbox("Checked" g_bDeveloper                 " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-developer")
-	g_cbDeveloperKeys := g_gui.AddCheckbox("Checked" g_bDeveloperKeys         " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-developerkeys")
-	g_cbDisable3dpreloads := g_gui.AddCheckbox("Checked" g_bDisable3dpreloads " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-disable3dpreloads")
-	g_cbNodialog := g_gui.AddCheckbox("Checked" g_bNodialog                   " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-nodialog")
-	g_cbNovidmemcheck := g_gui.AddCheckbox("Checked" g_bNovidmemcheck         " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-novidmemcheck")
-	g_cbProfile := g_gui.AddCheckbox("Checked" g_bProfile                     " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-profile")
-	g_cbScreenshot := g_gui.AddCheckbox("Checked" g_bScreenshot               " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-screenshot")
-	g_cbShowprogress:= g_gui.AddCheckbox("Checked" g_bShowprogress            " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-showprogress")
-	g_cbSkipstartup := g_gui.AddCheckbox("Checked" g_bSkipstartup             " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-skipstartup")
-	g_cbWindow := g_gui.AddCheckbox("Checked" g_bWindow                       " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "-window")
+	g_linkPCGW := g_gui.AddLink("x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "See this link for more details.")
+	g_cbDeveloper := g_gui.AddCheckbox("Checked" g_bDeveloper                 " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-developer")
+	g_cbDeveloperKeys := g_gui.AddCheckbox("Checked" g_bDeveloperKeys         " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-developerkeys")
+	g_cbDisable3dpreloads := g_gui.AddCheckbox("Checked" g_bDisable3dpreloads " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-disable3dpreloads")
+	g_cbNodialog := g_gui.AddCheckbox("Checked" g_bNodialog                   " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-nodialog")
+	g_cbNovidmemcheck := g_gui.AddCheckbox("Checked" g_bNovidmemcheck         " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-novidmemcheck")
+	g_cbProfile := g_gui.AddCheckbox("Checked" g_bProfile                     " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-profile")
+	g_cbScreenshot := g_gui.AddCheckbox("Checked" g_bScreenshot               " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-screenshot")
+	g_cbShowprogress:= g_gui.AddCheckbox("Checked" g_bShowprogress            " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-showprogress")
+	g_cbSkipstartup := g_gui.AddCheckbox("Checked" g_bSkipstartup             " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-skipstartup")
+	g_cbWindow := g_gui.AddCheckbox("Checked" g_bWindow                       " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-window")
 
 	; Extra
-	l_nTopY += l_nSpacingY + 12
-	g_gui.AddGroupBox("h" l_nSpacingY * 3.1 " x" l_nLeftX - 7 " y" l_nTopY + l_nCurrentRow * l_nSpacingY " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4, "Extras")
-	g_cbUnlockAllChapters := g_gui.AddCheckbox("x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Unlock all chapters")
-	g_cbUnlockAllDiff := g_gui.AddCheckbox("x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Unlock all difficulties")
+	l_iTopY += l_iSpacingY + 12
+	g_gui.AddGroupBox("h" l_iSpacingY * 3.1 " x" l_iLeftX - 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4, "Extras")
+	g_cbUnlockAllChapters := g_gui.AddCheckbox("x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "Unlock all chapters")
+	g_cbUnlockAllDiff := g_gui.AddCheckbox("x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "Unlock all difficulties")
 
 	; Customized game
-	l_nTopY += l_nSpacingY + 12
-	g_gui.AddGroupBox("h" l_nSpacingY * 2.6 " x" l_nLeftX - 7 " y" l_nTopY + l_nCurrentRow * l_nSpacingY " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4,
+	l_iTopY += l_iSpacingY + 12
+	g_gui.AddGroupBox("h" l_iSpacingY * 2.6 " x" l_iLeftX - 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4,
 	                  "Choose customized game")
-	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + 5)
+	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + 5)
 
 	g_tabs.UseTab(0)
-	g_btnStart := g_gui.AddButton("Background1F1F1F Default x210 w" l_nRightWidth, "&Start game")
+	g_btnStart := g_gui.AddButton("Background1F1F1F Default x210 w" l_iRightWidth, "&Start game")
 
 	; Events
 	g_tabs.OnEvent("Change", GuiTab_Change)
@@ -165,91 +165,91 @@ CreateGuiWidescreen()
 	local l_arrExtraKeys := ["None", "Backspace", "Enter", "Escape", "Space", "Tab", "LButton", "RButton", "MButton", "XButton1", "XButton2"]
 
 	; Layout constants
-	local l_nCurrentRow := 0
-	local l_nSpacingX := 10
-	local l_nSpacingY := 25
-	local l_nTopY := 35
+	local l_iCurrentRow := 0
+	local l_iSpacingX := 10
+	local l_iSpacingY := 25
+	local l_iTopY := 35
 	; Leftmost controls
-	local l_nLeftWidth := 150
-	local l_nLeftX := 35
+	local l_iLeftWidth := 150
+	local l_iLeftX := 35
 	; Middle controls
-	local l_nMiddleX := l_nLeftX + l_nLeftWidth + l_nSpacingX
-	local l_nMiddleWidth := 200
+	local l_iMiddleX := l_iLeftX + l_iLeftWidth + l_iSpacingX
+	local l_iMiddleWidth := 200
 	; Rightmost controls
-	local l_nRightX := l_nMiddleX + l_nMiddleWidth + l_nSpacingX
-	local l_nRightWidth := 85
+	local l_iRightX := l_iMiddleX + l_iMiddleWidth + l_iSpacingX
+	local l_iRightWidth := 85
 
 	; Widescreen fix settings
 	g_tabs.Add(["Widescreen"])
 	g_arrTabs.Push("Widescreen")
 	g_tabs.UseTab(2)
 
-	g_gui.AddGroupBox("h" l_nSpacingY * 11.7 " x" l_nLeftX - 7 " y" l_nTopY " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4 + 15, "Widescreen fix")
+	g_gui.AddGroupBox("h" l_iSpacingY * 11.7 " x" l_iLeftX - 7 " y" l_iTopY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4 + 15, "Widescreen fix")
 
-	g_cbAllowAltTabbingWithoutPausing := g_gui.AddCheckbox("Checked" g_bAllowAltTabbingWithoutPausing " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY,
+	g_cbAllowAltTabbingWithoutPausing := g_gui.AddCheckbox("Checked" g_bAllowAltTabbingWithoutPausing " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY,
 	                                                       "Allow alt tabbing without pausing")
-	g_cbCutsceneBorders := g_gui.AddCheckbox("Checked" g_bCutsceneBorders - 1 " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Cutscene borders")
-	g_cbD3DHookBorders := g_gui.AddCheckbox("Checked" g_bD3DHookBorders " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "D3D hook borders")
+	g_cbCutsceneBorders := g_gui.AddCheckbox("Checked" g_bCutsceneBorders - 1 " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "Cutscene borders")
+	g_cbD3DHookBorders := g_gui.AddCheckbox("Checked" g_bD3DHookBorders " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "D3D hook borders")
 	g_gui.AddText("vSliderFOVFactorLeft", "FOV factor")
-	g_editFOVFactor := g_gui.AddEdit("vSliderFOVFactorRight CBlack R1 ReadOnly w" l_nRightWidth, g_fFOVFactor)
-	g_sliderFOVFactor := g_gui.AddSlider("AltSubmit Buddy1SliderFOVFactorLeft Buddy2SliderFOVFactorRight NoTicks Page2 Range1-20 x" l_nMiddleX
-	                                     " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY - 2 " w" l_nMiddleWidth + 15, g_fFOVFactor * 10)
-	g_cbGraphicNovelMode := g_gui.AddCheckbox("Checked" g_bGraphicNovelMode " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Graphic novel mode")
-	g_gui.AddLink("Right x" l_nLeftX + 10 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY + 5 " w" l_nLeftWidth,
+	g_editFOVFactor := g_gui.AddEdit("vSliderFOVFactorRight CBlack R1 ReadOnly w" l_iRightWidth, g_fFOVFactor)
+	g_sliderFOVFactor := g_gui.AddSlider("AltSubmit Buddy1SliderFOVFactorLeft Buddy2SliderFOVFactorRight NoTicks Page2 Range1-20 x" l_iMiddleX
+	                                     " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY - 2 " w" l_iMiddleWidth + 15, g_fFOVFactor * 10)
+	g_cbGraphicNovelMode := g_gui.AddCheckbox("Checked" g_bGraphicNovelMode " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "Graphic novel mode")
+	g_gui.AddLink("Right x" l_iLeftX + 10 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY + 5 " w" l_iLeftWidth,
 	              'Graphic novel mode <a href="https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes">key</a>')
-	g_hkGraphicNovelModeKey := g_gui.AddHotkey("CBlack R1 x" l_nMiddleX + 10 " y" l_nTopY + l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth, g_sGraphicNovelModeKey)
+	g_hkGraphicNovelModeKey := g_gui.AddHotkey("CBlack R1 x" l_iMiddleX + 10 " y" l_iTopY + l_iCurrentRow * l_iSpacingY " w" l_iMiddleWidth, g_sGraphicNovelModeKey)
 
-	g_ddlGraphicNovelModeKey := g_gui.AddDropDownList("x" l_nRightX + 7 " y" l_nTopY + l_nSpacingY * l_nCurrentRow " w" l_nRightWidth, l_arrExtraKeys)
+	g_ddlGraphicNovelModeKey := g_gui.AddDropDownList("x" l_iRightX + 7 " y" l_iTopY + l_iSpacingY * l_iCurrentRow " w" l_iRightWidth, l_arrExtraKeys)
 	g_ddlGraphicNovelModeKey.Text := IsExtraOption(g_sGraphicNovelModeKey) ? g_sGraphicNovelModeKey : "None"
 
-	g_gui.AddText("Right x" l_nLeftX + 10 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY + 5 " w" l_nLeftWidth, "Load save slot")
-	g_ddlLoadSaveSlot := g_gui.AddDropDownList("Choose" Abs(g_nLoadSaveSlot) " x" l_nMiddleX + 10 " y" l_nTopY + l_nCurrentRow * l_nSpacingY
-	                                           " w" l_nMiddleWidth, ["Disable", "Load last used", "Load most recent"])
-	l_nTopY += 5
-	g_cbUseGameFolderForSavegames := g_gui.AddCheckbox("Checked" g_bUseGameFolderForSavegames " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY,
+	g_gui.AddText("Right x" l_iLeftX + 10 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY + 5 " w" l_iLeftWidth, "Load save slot")
+	g_ddlLoadSaveSlot := g_gui.AddDropDownList("Choose" Abs(g_iLoadSaveSlot) " x" l_iMiddleX + 10 " y" l_iTopY + l_iCurrentRow * l_iSpacingY
+	                                           " w" l_iMiddleWidth, ["Disable", "Load last used", "Load most recent"])
+	l_iTopY += 5
+	g_cbUseGameFolderForSavegames := g_gui.AddCheckbox("Checked" g_bUseGameFolderForSavegames " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY,
 	                                                   "Use game folder for savegames")
-	g_cbWidescreenHud := g_gui.AddCheckbox("Checked" g_bWidescreenHud " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Widescreen HUD")
+	g_cbWidescreenHud := g_gui.AddCheckbox("Checked" g_bWidescreenHud " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "Widescreen HUD")
 	g_gui.AddText("vSliderWidescreenHudOffsetLeft", "Widescreen HUD offset")
-	g_editWidescreenHudOffset := g_gui.AddEdit("vSliderWidescreenHudOffsetRight CBlack R1 ReadOnly w" l_nRightWidth, g_fWidescreenHudOffset)
+	g_editWidescreenHudOffset := g_gui.AddEdit("vSliderWidescreenHudOffsetRight CBlack R1 ReadOnly w" l_iRightWidth, g_fWidescreenHudOffset)
 	g_sliderWidescreenHudOffset := g_gui.AddSlider("AltSubmit Buddy1SliderWidescreenHudOffsetLeft Buddy2SliderWidescreenHudOffsetRight NoTicks Page10 Range10-200 x"
-	                                               l_nMiddleX " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_fWidescreenHudOffset)
+	                                               l_iMiddleX " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iMiddleWidth + 15, g_fWidescreenHudOffset)
 
 	; Xbox rain droplets settings
-	l_nTopY += l_nSpacingY + 27
-	g_gbXbox := g_gui.AddGroupBox("h" l_nSpacingY * 8.7 " x" l_nLeftX - 7 " y" l_nTopY + l_nCurrentRow * l_nSpacingY - 5
-	                              " w" l_nLeftWidth + l_nMiddleWidth + l_nRightWidth + l_nSpacingX * 4 + 15, "Xbox rain droplets")
+	l_iTopY += l_iSpacingY + 27
+	g_gbXbox := g_gui.AddGroupBox("h" l_iSpacingY * 8.7 " x" l_iLeftX - 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY - 5
+	                              " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4 + 15, "Xbox rain droplets")
 
-	g_cbEnableGravity := g_gui.AddCheckbox("Checked" g_bEnableGravity " x" l_nLeftX + 15 " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY, "Enable gravity")
+	g_cbEnableGravity := g_gui.AddCheckbox("Checked" g_bEnableGravity " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "Enable gravity")
 
 	g_textMinSize := g_gui.AddText("vSliderMinSizeLeft", "Mininum size")
-	g_editMinSize := g_gui.AddEdit("vSliderMinSizeRight CBlack R1 ReadOnly w" l_nRightWidth, g_nMinSize)
-	g_sliderMinSize := g_gui.AddSlider("AltSubmit Buddy1SliderMinSizeLeft Buddy2SliderMinSizeRight NoTicks Range1-9 x" l_nMiddleX
-	                                   " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_nMinSize)
+	g_editMinSize := g_gui.AddEdit("vSliderMinSizeRight CBlack R1 ReadOnly w" l_iRightWidth, g_iMinSize)
+	g_sliderMinSize := g_gui.AddSlider("AltSubmit Buddy1SliderMinSizeLeft Buddy2SliderMinSizeRight NoTicks Range1-9 x" l_iMiddleX
+	                                   " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iMiddleWidth + 15, g_iMinSize)
 
 	g_textMaxDrops := g_gui.AddText("vSliderMaxDropsLeft", "Maximum drops")
-	g_editMaxDrops := g_gui.AddEdit("vSliderMaxDropsRight CBlack R1 ReadOnly w" l_nRightWidth, g_nMaxDrops)
-	g_sliderMaxDrops := g_gui.AddSlider("AltSubmit Buddy1SliderMaxDropsLeft Buddy2SliderMaxDropsRight NoTicks Page200 Range1000-10000 x" l_nMiddleX
-	                                    " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_nMaxDrops)
+	g_editMaxDrops := g_gui.AddEdit("vSliderMaxDropsRight CBlack R1 ReadOnly w" l_iRightWidth, g_iMaxDrops)
+	g_sliderMaxDrops := g_gui.AddSlider("AltSubmit Buddy1SliderMaxDropsLeft Buddy2SliderMaxDropsRight NoTicks Page200 Range1000-10000 x" l_iMiddleX
+	                                    " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iMiddleWidth + 15, g_iMaxDrops)
 
 	g_textMaxMovingDrops := g_gui.AddText("vSliderMaxMovingDropsLeft", "Maximum moving drops")
-	g_editMaxMovingDrops := g_gui.AddEdit("vSliderMaxMovingDropsRight CBlack R1 ReadOnly w" l_nRightWidth, g_nMaxMovingDrops)
-	g_sliderMaxMovingDrops := g_gui.AddSlider("AltSubmit Buddy1SliderMaxMovingDropsLeft Buddy2SliderMaxMovingDropsRight NoTicks Page200 Range1000-10000 x" l_nMiddleX
-	                                          " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_nMaxMovingDrops)
+	g_editMaxMovingDrops := g_gui.AddEdit("vSliderMaxMovingDropsRight CBlack R1 ReadOnly w" l_iRightWidth, g_iMaxMovingDrops)
+	g_sliderMaxMovingDrops := g_gui.AddSlider("AltSubmit Buddy1SliderMaxMovingDropsLeft Buddy2SliderMaxMovingDropsRight NoTicks Page200 Range1000-10000 x" l_iMiddleX
+	                                          " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iMiddleWidth + 15, g_iMaxMovingDrops)
 
 	g_textMaxSize := g_gui.AddText("vSliderMaxSizeLeft", "Maximum size")
-	g_editMaxSize := g_gui.AddEdit("vSliderMaxSizeRight CBlack R1 ReadOnly w" l_nRightWidth, g_nMaxSize)
-	g_sliderMaxSize := g_gui.AddSlider("AltSubmit Buddy1SliderMaxSizeLeft Buddy2SliderMaxSizeRight NoTicks Page2 Range10-30 x" l_nMiddleX
-	                                   " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_nMaxSize)
+	g_editMaxSize := g_gui.AddEdit("vSliderMaxSizeRight CBlack R1 ReadOnly w" l_iRightWidth, g_iMaxSize)
+	g_sliderMaxSize := g_gui.AddSlider("AltSubmit Buddy1SliderMaxSizeLeft Buddy2SliderMaxSizeRight NoTicks Page2 Range10-30 x" l_iMiddleX
+	                                   " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iMiddleWidth + 15, g_iMaxSize)
 
 	g_textMoveStep := g_gui.AddText("vSliderMoveStepLeft", "Move step")
-	g_editMoveStep := g_gui.AddEdit("vSliderMoveStepRight CBlack R1 ReadOnly w" l_nRightWidth, g_fMoveStep)
-	g_sliderMoveStep := g_gui.AddSlider("AltSubmit Buddy1SliderMoveStepLeft Buddy2SliderMoveStepRight NoTicks Page2 Range1-20 x" l_nMiddleX
-	                                    " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_fMoveStep * 10)
+	g_editMoveStep := g_gui.AddEdit("vSliderMoveStepRight CBlack R1 ReadOnly w" l_iRightWidth, g_fMoveStep)
+	g_sliderMoveStep := g_gui.AddSlider("AltSubmit Buddy1SliderMoveStepLeft Buddy2SliderMoveStepRight NoTicks Page2 Range1-20 x" l_iMiddleX
+	                                    " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iMiddleWidth + 15, g_fMoveStep * 10)
 
 	g_textSpeedAdjuster := g_gui.AddText("vSliderSpeedAdjusterLeft", "Speed adjuster")
-	g_editSpeedAdjuster := g_gui.AddEdit("vSliderSpeedAdjusterRight CBlack R1 ReadOnly w" l_nRightWidth, g_fSpeedAdjuster)
-	g_sliderSpeedAdjuster := g_gui.AddSlider("AltSubmit Buddy1SliderSpeedAdjusterLeft Buddy2SliderSpeedAdjusterRight NoTicks Page2 Range1-20 x" l_nMiddleX
-	                                         " y" l_nTopY + ++l_nCurrentRow * l_nSpacingY " w" l_nMiddleWidth + 15, g_fSpeedAdjuster * 10)
+	g_editSpeedAdjuster := g_gui.AddEdit("vSliderSpeedAdjusterRight CBlack R1 ReadOnly w" l_iRightWidth, g_fSpeedAdjuster)
+	g_sliderSpeedAdjuster := g_gui.AddSlider("AltSubmit Buddy1SliderSpeedAdjusterLeft Buddy2SliderSpeedAdjusterRight NoTicks Page2 Range1-20 x" l_iMiddleX
+	                                         " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iMiddleWidth + 15, g_fSpeedAdjuster * 10)
 
 	; Events
 	g_sliderFOVFactor.OnEvent("Change", (*) => g_editFOVFactor.Text := Round(g_sliderFOVFactor.Value / 10.0, 1))
@@ -274,15 +274,15 @@ GetResolutionList(p_nDisp := 1)
 	; https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaysettingsw
 	while DllCall("EnumDisplaySettingsW", "WStr", "\\.\DISPLAY" p_nDisp, "UInt", A_Index - 1, "Ptr", l_bufDevMode.Ptr)
 	{
-		l_nBpp := NumGet(l_bufDevMode, 168, "UInt")
-		l_nFreq := NumGet(l_bufDevMode, 184, "UInt")
+		l_iBpp := NumGet(l_bufDevMode, 168, "UInt")
+		l_iFreq := NumGet(l_bufDevMode, 184, "UInt")
 
 		; Only store 32-bit resolutions
-		if (l_nBpp == 32)
+		if (l_iBpp == 32)
 		{
-			l_nWidth := NumGet(l_bufDevMode, 172, "UInt")
-			l_nHeight := NumGet(l_bufDevMode, 176, "UInt")
-			l_sRes .= Format('{:} x {:}`n', l_nWidth, l_nHeight)
+			l_iWidth := NumGet(l_bufDevMode, 172, "UInt")
+			l_iHeight := NumGet(l_bufDevMode, 176, "UInt")
+			l_sRes .= Format('{:} x {:}`n', l_iWidth, l_iHeight)
 		}
 	}
 
@@ -488,17 +488,17 @@ GuiUpdateWidescreen()
 		g_sliderFOVFactor.Value := g_fFOVFactor * 10
 		g_cbGraphicNovelMode.Value := g_bGraphicNovelMode
 		g_hkGraphicNovelModeKey.Value := g_sGraphicNovelModeKey
-		g_ddlLoadSaveSlot.Value := Abs(g_nLoadSaveSlot)
+		g_ddlLoadSaveSlot.Value := Abs(g_iLoadSaveSlot)
 		g_cbUseGameFolderForSavegames.Value := g_bUseGameFolderForSavegames
 		g_cbWidescreenHud.Value := g_bWidescreenHud
 		g_sliderWidescreenHudOffset.Value := g_editWidescreenHudOffset.Value := g_fWidescreenHudOffset
 
 		; Xbox
 		g_cbEnableGravity.Value := g_bEnableGravity
-		g_sliderMinSize.Value := g_editMinSize.Text := g_nMinSize
-		g_sliderMaxDrops.Value := g_editMaxDrops.Text := g_nMaxDrops
-		g_sliderMaxMovingDrops.Value := g_editMaxMovingDrops.Text := g_nMaxMovingDrops
-		g_sliderMaxSize.Value := g_editMaxSize.Text := g_nMaxSize
+		g_sliderMinSize.Value := g_editMinSize.Text := g_iMinSize
+		g_sliderMaxDrops.Value := g_editMaxDrops.Text := g_iMaxDrops
+		g_sliderMaxMovingDrops.Value := g_editMaxMovingDrops.Text := g_iMaxMovingDrops
+		g_sliderMaxSize.Value := g_editMaxSize.Text := g_iMaxSize
 		g_editMoveStep.Text := g_fMoveStep
 		g_sliderMoveStep.Value := g_fMoveStep * 10
 		g_editSpeedAdjuster.Text := g_fSpeedAdjuster
@@ -545,8 +545,8 @@ ReadConfigFile()
 
 	g_bMaxPayne2         := IniRead(g_sConfigFile, "General", "bMaxPayne2", true) == true
 	g_sGameDir           := IniRead(g_sConfigFile, "General", "sGameDir", "C:\Program Files\Steam\steamapps\common\Max Payne 2\")
-	g_nWidth             := IniRead(g_sConfigFile, "General", "nWidth", 2560)
-	g_nHeight            := IniRead(g_sConfigFile, "General", "nHeight", 1440)
+	g_iWidth             := IniRead(g_sConfigFile, "General", "iWidth", 2560)
+	g_iHeight            := IniRead(g_sConfigFile, "General", "iHeight", 1440)
 	g_sModName           := IniRead(g_sConfigFile, "General", "sModName", "")
 	g_bUnlockAllChapters := IniRead(g_sConfigFile, "General", "bUnlockAllChapters", false) == true
 	g_bUnlockAllDiff     := IniRead(g_sConfigFile, "General", "bUnlockAllDiff", false) == true
@@ -563,9 +563,9 @@ ReadConfigFile()
 	g_bNoGUI             := IniRead(g_sConfigFile, "General", "bNoGUI", false) == true
 
 	; Clamping remaining variables
-	g_nWidth := ClampType(g_nWidth, 2560, "int", 640, 10000)
-	g_nHeight := ClampType(g_nHeight, 1440, "int", 480, 10000)
-	g_sResolution := g_nWidth " x " g_nHeight
+	g_iWidth := ClampType(g_iWidth, 2560, "int", 640, 10000)
+	g_iHeight := ClampType(g_iHeight, 1440, "int", 480, 10000)
+	g_sResolution := g_iWidth " x " g_iHeight
 }
 
 ReadWidescreenFixConfigFile()
@@ -596,14 +596,14 @@ ReadWidescreenFixConfigFile()
 	g_bD3DHookBorders                  := Trim(g_arrD3DHookBorders[1]) == true
 
 	; Misc
-	g_nLoadSaveSlot                    := Trim(g_arrLoadSaveSlot[1])
+	g_iLoadSaveSlot                    := Trim(g_arrLoadSaveSlot[1])
 	g_bUseGameFolderForSavegames       := Trim(g_arrUseGameFolderForSavegames[1]) == true
 	g_bAllowAltTabbingWithoutPausing   := Trim(g_arrAllowAltTabbingWithoutPausing[1]) == true
 
 	; Clamping remaining variables
 	g_fWidescreenHudOffset := ClampType(g_fWidescreenHudOffset, 100.0, "float", 10.0, 200.0)
 	g_fFOVFactor := ClampType(g_fFOVFactor, 1.0, "float", 0.1, 2.0)
-	g_nLoadSaveSlot := ClampType(g_nLoadSaveSlot, -1, "int", -3, -1)
+	g_iLoadSaveSlot := ClampType(g_iLoadSaveSlot, -1, "int", -3, -1)
 
 	; Convert the GraphicNovelMode key to human readable format
 	local l_sGraphicNovelModeKey := GetKeyName(StrReplace(g_sGraphicNovelModeKey, "0x", "vk"))
@@ -616,19 +616,19 @@ ReadXboxRainDropletsConfigFile()
 
 	g_sXboxCfgFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".XboxRainDroplets.ini"
 
-	g_nMinSize        := IniRead(g_sXboxCfgFile, "MAIN", "MinSize", 4)
-	g_nMaxSize        := IniRead(g_sXboxCfgFile, "MAIN", "MaxSize", 15)
-	g_nMaxDrops       := IniRead(g_sXboxCfgFile, "MAIN", "MaxDrops", 3000)
-	g_nMaxMovingDrops := IniRead(g_sXboxCfgFile, "MAIN", "MaxMovingDrops", 6000)
+	g_iMinSize        := IniRead(g_sXboxCfgFile, "MAIN", "MinSize", 4)
+	g_iMaxSize        := IniRead(g_sXboxCfgFile, "MAIN", "MaxSize", 15)
+	g_iMaxDrops       := IniRead(g_sXboxCfgFile, "MAIN", "MaxDrops", 3000)
+	g_iMaxMovingDrops := IniRead(g_sXboxCfgFile, "MAIN", "MaxMovingDrops", 6000)
 	g_bEnableGravity  := IniRead(g_sXboxCfgFile, "MAIN", "EnableGravity", true) == true
 	g_fSpeedAdjuster  := IniRead(g_sXboxCfgFile, "MAIN", "SpeedAdjuster", 1.0)
 	g_fMoveStep       := IniRead(g_sXboxCfgFile, "MAIN", "MoveStep", 0.1)
 
 	; Clamping remaining variables
-	g_nMinSize := ClampType(g_nMinSize, 4, "int", 1, 9)
-	g_nMaxSize := ClampType(g_nMaxSize, 15, "int", 10, 30)
-	g_nMaxDrops := ClampType(g_nMaxDrops, 3000, "int", 1000, 10000)
-	g_nMaxMovingDrops := ClampType(g_nMaxMovingDrops, 6000, "int", 1000, 10000)
+	g_iMinSize := ClampType(g_iMinSize, 4, "int", 1, 9)
+	g_iMaxSize := ClampType(g_iMaxSize, 15, "int", 10, 30)
+	g_iMaxDrops := ClampType(g_iMaxDrops, 3000, "int", 1000, 10000)
+	g_iMaxMovingDrops := ClampType(g_iMaxMovingDrops, 6000, "int", 1000, 10000)
 	g_fSpeedAdjuster := ClampType(g_fSpeedAdjuster, 1.0, "float", 0.1, 2.0)
 	g_fMoveStep := ClampType(g_fMoveStep, 0.1, "float", 0.1, 2.0)
 }
@@ -638,12 +638,12 @@ SaveSettings()
 	try
 	{
 		l_arrResolution := StrSplit(g_sResolution, " x ")
-		global g_nWidth := l_arrResolution[1]
-		global g_nHeight := l_arrResolution[2]
+		global g_iWidth := l_arrResolution[1]
+		global g_iHeight := l_arrResolution[2]
 
 		; Write to the registry
-		RegWrite(g_nWidth,  "REG_DWORD", g_sGameRegKey "Video Settings", "Display Width")
-		RegWrite(g_nHeight, "REG_DWORD", g_sGameRegKey "Video Settings", "Display Height")
+		RegWrite(g_iWidth,  "REG_DWORD", g_sGameRegKey "Video Settings", "Display Width")
+		RegWrite(g_iHeight, "REG_DWORD", g_sGameRegKey "Video Settings", "Display Height")
 		RegWrite(g_sModName,   "REG_SZ", g_sGameRegKey "Customized Game", "Customized Game")
 		
 		if (g_bUnlockAllChapters)
@@ -661,8 +661,8 @@ SaveSettings()
 		{
 			IniWrite(g_radioMP2.Value, g_sConfigFile,            "General", "bMaxPayne2")
 			IniWrite(g_sGameDir, g_sConfigFile,                  "General", "sGameDir")
-			IniWrite(g_nWidth, g_sConfigFile,                    "General", "nWidth")
-			IniWrite(g_nHeight, g_sConfigFile,                   "General", "nHeight")
+			IniWrite(g_iWidth, g_sConfigFile,                    "General", "iWidth")
+			IniWrite(g_iHeight, g_sConfigFile,                   "General", "iHeight")
 			IniWrite(g_sModName, g_sConfigFile,                  "General", "sModName")
 			IniWrite(g_cbUnlockAllChapters.Value, g_sConfigFile, "General", "bUnlockAllChapters")
 			IniWrite(g_cbUnlockAllDiff.Value, g_sConfigFile,     "General", "bUnlockAllDiff")
