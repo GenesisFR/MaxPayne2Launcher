@@ -258,7 +258,7 @@ GuiCreateGeneral()
 	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + 5)
 
 	g_tabs.UseTab(0)
-	g_btnStart := g_gui.AddButton("Background1F1F1F Default x210 w" l_iRightWidth, "&Start game")
+	g_btnStart := g_gui.AddButton("Background1F1F1F Default x223 w" l_iRightWidth, "&Start game")
 
 	; Events
 	g_tabs.OnEvent("Change", GuiTab_Change)
@@ -645,7 +645,7 @@ SaveSettings()
 		RegWrite(g_iWidth,  "REG_DWORD", g_sGameRegKey "Video Settings", "Display Width")
 		RegWrite(g_iHeight, "REG_DWORD", g_sGameRegKey "Video Settings", "Display Height")
 		RegWrite(g_sModName,   "REG_SZ", g_sGameRegKey "Customized Game", "Customized Game")
-		
+
 		if (g_bUnlockAllChapters)
 			RegWrite(g_bUnlockAllChapters, "REG_DWORD", g_sGameRegKey "Game Level", "LevelSelector")
 
