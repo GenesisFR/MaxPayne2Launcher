@@ -1,10 +1,10 @@
 # MaxPayne2Launcher
-An AutoHotkey 2 script for Max Payne 1 and 2 that allows you to force a resolution, launch a specific mod, unlock all chapters/difficulties and use other options that are not available in the original launcher.
+An AutoHotkey 2 script for Max Payne 1 and 2 that allows you to specify a resolution, launch mods, unlock all chapters/difficulties and use other options that are not available in the original launcher. It also supports the widescreen [fix](https://fusionfix.io/wfp#mp1) and Xbox rain droplets [plugin](https://github.com/ThirteenAG/XboxRainDroplets/releases/tag/maxpayne2) if they are detected.
 
 It automates user interaction with the game launcher based on user-defined settings and comes with a config file to save settings on exit.
 
-The typical use case is to easily specify resolutions above 1080p (otherwise the resolution may get reset when opening the game launcher and you have to select the second display adapter to see all resolutions), for those who'd like something similar to the "-nodialog" launch parameter (which skips the launcher but prevents the game from loading mods and creates other [issues](https://github.com/c6-dev/mp2fix)), or for those who'd like to use extra options (such as developer or windowed mode).
+For those who'd like to use the `-nodialog` launch parameter (which skips the launcher but prevents the game from loading mods and creates other [problems](https://github.com/c6-dev/mp2fix)), you can get a similar result without the aforementioned issues by using `bNoGUI=1` in the config file.
 
 The [Startup Hang Patch](https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch/) is heavily recommended.
 
-<img width="486" height="755" alt="image" src="https://github.com/user-attachments/assets/1888fb25-783e-4677-985f-cd6e428260bd" />
+<img width="1094" height="754" alt="image" src="https://github.com/user-attachments/assets/02ec82df-4630-4792-93f2-82801053e17d" />
