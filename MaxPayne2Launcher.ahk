@@ -56,7 +56,7 @@ CheckGameExe()
 	return false
 }
 
-ClampType(p_sValue, p_sDefault, p_sType, p_nMin := 0, p_nMax := 0)
+ClampType(p_sValue, p_sDefault, p_sType, p_iMin := 0, p_iMax := 0)
 {
 	try
 	{
@@ -67,8 +67,8 @@ ClampType(p_sValue, p_sDefault, p_sType, p_nMin := 0, p_nMax := 0)
 		return p_sDefault
 	}
 
-	l_iValue := Min(l_iValue, p_nMax)
-	l_iValue := Max(l_iValue, p_nMin)
+	l_iValue := Min(l_iValue, p_iMax)
+	l_iValue := Max(l_iValue, p_iMin)
 
 	if (p_sType == "float")
 		l_iValue := Round(l_iValue, 1)
@@ -77,13 +77,13 @@ ClampType(p_sValue, p_sDefault, p_sType, p_nMin := 0, p_nMax := 0)
 }
 
 ; https://www.autohotkey.com/boards/viewtopic.php?t=77664
-GetResolutionList(p_nDisp := 1)
+GetResolutionList(p_iDisp := 1)
 {
 	l_bufDevMode := Buffer(220, 0)
 	l_sRes := ""
 
 	; https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaysettingsw
-	while DllCall("EnumDisplaySettingsW", "WStr", "\\.\DISPLAY" p_nDisp, "UInt", A_Index - 1, "Ptr", l_bufDevMode.Ptr)
+	while DllCall("EnumDisplaySettingsW", "WStr", "\\.\DISPLAY" p_iDisp, "UInt", A_Index - 1, "Ptr", l_bufDevMode.Ptr)
 	{
 		l_iBpp := NumGet(l_bufDevMode, 168, "UInt")
 		l_iFreq := NumGet(l_bufDevMode, 184, "UInt")
@@ -220,7 +220,7 @@ GuiCreateGeneral()
 	; Game
 	g_gui.AddGroupBox("h" l_iSpacingY * 3.5 " x" l_iLeftX - 7 " y" l_iTopY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4, "Game")
 	g_gui.AddText("Right x" l_iLeftX " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth, "Choose your game")
-	g_radioMP1 := g_gui.AddRadio("Checked" (g_bMaxPayne2 ? "0" : "1") " x" l_iMiddleX " y" l_iTopY + l_iCurrentRow * l_iSpacingY, "Max Payne")
+	g_radioMP1 := g_gui.AddRadio("x" l_iMiddleX " y" l_iTopY + l_iCurrentRow * l_iSpacingY, "Max Payne")
 	g_radioMP2 := g_gui.AddRadio("Checked" g_bMaxPayne2 " x" l_iMiddleX + 100 " y" l_iTopY + l_iCurrentRow * l_iSpacingY, "Max Payne 2")
 	g_gui.AddButton("Background1F1F1F Default x" l_iRightX " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY - 7 " w" l_iRightWidth, "&Browse").OnEvent("Click",
 	                GuiButtonBrowse_Click)
@@ -412,8 +412,6 @@ GuiHK_Change(GuiCtrlObj, Info)
 	l_bControl := InStr(GuiCtrlObj.Value, "^")
 	l_bAlt := InStr(GuiCtrlObj.Value, "!")
 
-	OutputDebug("l_hotkey(" l_sHotkey ") l_bShift(" l_bShift ") l_bControl(" l_bControl ") l_bAlt(" l_bAlt ")`n")
-
 	if (l_bShift && !l_bControl && !l_bAlt && l_sHotkeyLength == 1)
 		GuiCtrlObj.Value := "LShift"
 	else if (!l_bShift && l_bControl && !l_bAlt && l_sHotkeyLength == 1)
@@ -514,6 +512,7 @@ GuiUpdateWidescreen()
 	else if (g_arrTabs.Length > 1)
 	{
 		g_tabs.Delete(2)
+		; There are artifacts if we don't redraw the tabs after deleting one
 		g_tabs.Redraw()
 		g_arrTabs.Pop()
 	}
@@ -752,7 +751,7 @@ UpdateGame()
 	local l_sLink := "https://www.pcgamingwiki.com/wiki/Max_Payne" (g_bMaxPayne2 ? "_2:_The_Fall_of_Max_Payne" : "") "#Command_line_arguments"
 
 	g_sGameExe := "MaxPayne" (g_bMaxPayne2 ? "2" : "") ".exe"
-	g_sGameRegKey := "HKEY_CURRENT_USER\Software\Remedy Entertainment\Max Payne" (g_bMaxPayne2 ? " 2\" : "\")
+	g_sGameRegKey := "HKCU\Software\Remedy Entertainment\Max Payne" (g_bMaxPayne2 ? " 2\" : "\")
 	g_sWinTitleGame := "ahk_exe " g_sGameExe " ahk_class MaxPayne" (g_bMaxPayne2 ? "2" : "")
 	g_sWinTitleLauncher := "ahk_exe " g_sGameExe " ahk_class #32770"
 	g_linkPCGW.Text := 'See this <a href="' l_sLink '">link</a> for more details.'
@@ -790,6 +789,7 @@ UpdateMods()
 		g_arrModFiles.Push(l_sFileNameNoExt)
 	}
 
+	; Recreate the entries in the mod drop-down list
 	g_ddlCustomGame.Delete()
 	g_ddlCustomGame.Add(g_arrModFiles)
 	g_ddlCustomGame.Choose(g_sModName)
