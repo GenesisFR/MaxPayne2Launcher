@@ -34,17 +34,27 @@ BuildLaunchArgs()
 
 CheckGameExe()
 {
-	; Check for game exe in the user-defined directory
-	if (!FileExist(g_sGameDir g_sGameExe))
+	; Check in the user-defined directory
+	if (FileExist(g_sGameDir g_sGameExe))
+		return true
+
+	; Check in the current directory
+	if (FileExist(g_sGameExe))
 	{
-		; Not found, check in the current directory
-		if (!FileExist(g_sGameExe))
-			return false
-		else
-			global g_sGameDir := g_editGameDir.Text := A_WorkingDir "\"
+		global g_sGameDir := g_editGameDir.Text := A_WorkingDir "\"
+		return true
 	}
 
-	return true
+	; Check from the registry
+	try l_sGameDir := RegRead("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App " (g_bMaxPayne2 ? "12150" : "12140"), "InstallLocation", "")
+
+	if (l_sGameDir && FileExist(l_sGameDir g_sGameExe))
+	{
+		global g_sGameDir := g_editGameDir.Text := l_sGameDir "\"
+		return true
+	}
+
+	return false
 }
 
 ClampType(p_sValue, p_sDefault, p_sType, p_nMin := 0, p_nMax := 0)
@@ -518,7 +528,8 @@ Init()
 	ReadConfigFile()
 	GuiCreateGeneral()
 	UpdateGame()
-	CheckGameExe()
+	if (!CheckGameExe())
+		MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Error", 16)
 	UpdateMods()
 
 	if (g_bNoGUI)
