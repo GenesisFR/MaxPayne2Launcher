@@ -13,7 +13,6 @@ BuildLaunchArgs()
 		"-developer",         g_cbDeveloper.Value,
 		"-developerkeys",     g_cbDeveloperKeys.Value,
 		"-disable3dpreloads", g_cbDisable3dpreloads.Value,
-		"-nodialog",          g_cbNodialog.Value,
 		"-novidmemcheck",     g_cbNovidmemcheck.Value,
 		"-profile",           g_cbProfile.Value,
 		"-screenshot",        g_cbScreenshot.Value,
@@ -153,7 +152,8 @@ GuiButtonStart_Click(*)
 			return
 		}
 
-		Run(g_sGameDir g_sGameExe " " BuildLaunchArgs())
+		DetectHiddenWindows(g_cbNodialog.Value)
+		Run(g_sGameDir g_sGameExe " " BuildLaunchArgs(), , g_cbNodialog.Value ? "Hide" : "")
 
 		; We give 15 seconds for the launcher to show up
 		; If it always hangs, you should consider using https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch
@@ -181,9 +181,6 @@ GuiCB_Click(GuiCtrlObj, Info)
 		case g_cbDeveloperKeys:
 			if (g_cbDeveloperKeys.Value)
 				g_cbDeveloper.Value := true
-		case g_cbNodialog:
-			if (g_cbNodialog.Value)
-				MsgBox("Using -nodialog will prevent the game from loading mods!", "Warning", 48) 
 		case g_cbShowprogress:
 			if (g_cbShowprogress.Value)
 				g_cbDeveloper.Value := true
@@ -277,7 +274,6 @@ GuiCreateGeneral()
 	g_ddlResolution.OnEvent(     "Change", GuiDDL_Change)
 	g_cbDeveloper.OnEvent(        "Click", GuiCB_Click)
 	g_cbDeveloperKeys.OnEvent(    "Click", GuiCB_Click)
-	g_cbNodialog.OnEvent(         "Click", GuiCB_Click)
 	g_cbShowprogress.OnEvent(     "Click", GuiCB_Click)
 	g_cbUnlockAllChapters.OnEvent("Click", GuiCB_Click)
 	g_cbUnlockAllDiff.OnEvent(    "Click", GuiCB_Click)
