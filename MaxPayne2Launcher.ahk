@@ -31,7 +31,27 @@ BuildLaunchArgs()
 	return l_sLaunchArgs
 }
 
-CheckGameExe()
+ClampType(p_sValue, p_sDefault, p_sType, p_iMin := 0, p_iMax := 0)
+{
+	try
+	{
+		l_iValue := p_sValue + (p_sType == "int" ? 0 : 0.0)
+	}
+	catch TypeError ; not an integer/float
+	{
+		return p_sDefault
+	}
+
+	l_iValue := Min(l_iValue, p_iMax)
+	l_iValue := Max(l_iValue, p_iMin)
+
+	if (p_sType == "float")
+		l_iValue := Round(l_iValue, 1)
+
+	return l_iValue
+}
+
+FindGameExe()
 {
 	; Check in the user-defined directory
 	if (FileExist(g_sGameDir g_sGameExe))
@@ -54,26 +74,6 @@ CheckGameExe()
 	}
 
 	return false
-}
-
-ClampType(p_sValue, p_sDefault, p_sType, p_iMin := 0, p_iMax := 0)
-{
-	try
-	{
-		l_iValue := p_sValue + (p_sType == "int" ? 0 : 0.0)
-	}
-	catch TypeError ; not an integer/float
-	{
-		return p_sDefault
-	}
-
-	l_iValue := Min(l_iValue, p_iMax)
-	l_iValue := Max(l_iValue, p_iMin)
-
-	if (p_sType == "float")
-		l_iValue := Round(l_iValue, 1)
-
-	return l_iValue
 }
 
 ; https://www.autohotkey.com/boards/viewtopic.php?t=77664
@@ -146,7 +146,7 @@ GuiButtonStart_Click(*)
 	; Otherwise start the launcher with arguments
 	else
 	{
-		if (!CheckGameExe())
+		if (!FindGameExe())
 		{
 			MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Error", 16)
 			return
@@ -523,7 +523,7 @@ Init()
 	ReadConfigFile()
 	GuiCreateGeneral()
 	UpdateGame()
-	if (!CheckGameExe())
+	if (!FindGameExe())
 		MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Error", 16)
 	UpdateMods()
 
