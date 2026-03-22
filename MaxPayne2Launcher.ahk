@@ -112,7 +112,7 @@ GuiButtonBrowse_Click(*)
 	; Turn FileSelect into a modal
 	g_gui.Opt("+OwnDialogs")
 
-	l_sSelectedFile := FileSelect("3", , "Select the target executable file", "Game executable (MaxPayne.exe; MaxPayne2.exe)")
+	l_sSelectedFile := FileSelect("3", , "Select the target executable file", "Max Payne executable (MaxPayne.exe; MaxPayne2.exe)")
 	SplitPath(l_sSelectedFile, &l_sGameExe, &l_sGameDir)
 
 	if (l_sGameExe ~= "i)\A(maxpayne.exe|maxpayne2.exe)\z")
@@ -238,10 +238,9 @@ GuiCreateGeneral()
 
 	; Resolution
 	l_iTopY += l_iSpacingY - 3
-	g_gui.AddGroupBox("h" l_iSpacingY * 2.6 " x" l_iLeftX - 7 " y" l_iTopY + l_iSpacingY * l_iCurrentRow " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4, "Resolution")
-	g_gui.AddText("Right x" l_iLeftX " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY + 5 " w" l_iLeftWidth, "Choose your resolution")
+	g_gui.AddGroupBox("h" l_iSpacingY * 2.6 " x" l_iLeftX - 7 " y" l_iTopY + l_iSpacingY * l_iCurrentRow++ " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4, "Resolution")
 	local l_arrResolutions := GetResolutionList()
-	g_ddlResolution := g_gui.AddDropDownList(" x" l_iMiddleX " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY " w" l_iMiddleWidth, l_arrResolutions)
+	g_ddlResolution := g_gui.AddDropDownList(" x" l_iLeftX + 10 " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + 7, l_arrResolutions)
 	try g_ddlResolution.Text := g_sResolution
 	catch
 	{
@@ -275,23 +274,23 @@ GuiCreateGeneral()
 	; Customized game
 	l_iTopY += l_iSpacingY + 12
 	g_gui.AddGroupBox("h" l_iSpacingY * 2.6 " x" l_iLeftX - 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4,
-	                  "Choose customized game")
-	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + 5)
+	                  "Customized game")
+	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_iLeftX + 10 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + 7)
 
 	g_tabs.UseTab(0)
 	g_gui.AddButton("Background1F1F1F Default x223 w" l_iRightWidth, "&Start game").OnEvent("Click", GuiButtonStart_Click)
 
 	; Events
-	g_tabs.OnEvent("Change", GuiTab_Change)
-	g_radioMP1.OnEvent(           "Click", GuiRadio_Click)
-	g_radioMP2.OnEvent(           "Click", GuiRadio_Click)
-	g_ddlResolution.OnEvent(     "Change", GuiDDL_Change)
 	g_cbDeveloper.OnEvent(        "Click", GuiCB_Click)
 	g_cbDeveloperKeys.OnEvent(    "Click", GuiCB_Click)
 	g_cbShowprogress.OnEvent(     "Click", GuiCB_Click)
 	g_cbUnlockAllChapters.OnEvent("Click", GuiCB_Click)
 	g_cbUnlockAllDiff.OnEvent(    "Click", GuiCB_Click)
 	g_ddlCustomGame.OnEvent(     "Change", GuiDDL_Change)
+	g_ddlResolution.OnEvent(     "Change", GuiDDL_Change)
+	g_radioMP1.OnEvent(           "Click", GuiRadio_Click)
+	g_radioMP2.OnEvent(           "Click", GuiRadio_Click)
+	g_tabs.OnEvent(              "Change", GuiTab_Change)
 }
 
 GuiCreateWidescreen()
@@ -389,17 +388,17 @@ GuiCreateWidescreen()
 	                                         " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iMiddleWidth + 15, g_fSpeedAdjuster * 10)
 
 	; Events
-	g_sliderFOVFactor.OnEvent(          "Change", GuiSlider_Change)
-	g_hkGraphicNovelModeKey.OnEvent(    "Change", GuiHK_Change)
-	g_ddlGraphicNovelModeKey.OnEvent(   "Change", GuiDDL_Change)
-	g_sliderWidescreenHudOffset.OnEvent("Change", GuiSlider_Change)
 	g_cbEnableXbox.OnEvent(              "Click", GuiCB_Click)
-	g_sliderMinSize.OnEvent(            "Change", GuiSlider_Change)
-	g_sliderMaxSize.OnEvent(            "Change", GuiSlider_Change)
+	g_ddlGraphicNovelModeKey.OnEvent(   "Change", GuiDDL_Change)
+	g_hkGraphicNovelModeKey.OnEvent(    "Change", GuiHK_Change)
+	g_sliderFOVFactor.OnEvent(          "Change", GuiSlider_Change)
 	g_sliderMaxDrops.OnEvent(           "Change", GuiSlider_Change)
 	g_sliderMaxMovingDrops.OnEvent(     "Change", GuiSlider_Change)
+	g_sliderMaxSize.OnEvent(            "Change", GuiSlider_Change)
+	g_sliderMinSize.OnEvent(            "Change", GuiSlider_Change)
 	g_sliderMoveStep.OnEvent(           "Change", GuiSlider_Change)
 	g_sliderSpeedAdjuster.OnEvent(      "Change", GuiSlider_Change)
+	g_sliderWidescreenHudOffset.OnEvent("Change", GuiSlider_Change)
 }
 
 GuiDDL_Change(GuiCtrlObj, Info)
