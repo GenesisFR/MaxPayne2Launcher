@@ -107,20 +107,25 @@ GetResolutionList(p_iDisp := 1)
 	return StrSplit(l_sRes, '`n')
 }
 
-GuiButtonBrowse_Click(*)
+Gui_DropFiles(GuiObj, GuiCtrlObj, FileArray, X, Y)
+{
+	GuiButtonBrowse_Click(false, FileArray[1])
+}
+
+GuiButtonBrowse_Click(p_bUseFileSelect := true, p_File := "")
 {
 	; Turn FileSelect into a modal
 	g_gui.Opt("+OwnDialogs")
 
-	l_sSelectedFile := FileSelect("3", , "Select the target executable file", "Max Payne executable (MaxPayne.exe; MaxPayne2.exe)")
-	SplitPath(l_sSelectedFile, &l_sGameExe, &l_sGameDir)
+	l_sSelectedFilePath := p_bUseFileSelect ? FileSelect("3", , "Select the target executable file", "Max Payne executable (MaxPayne.exe; MaxPayne2.exe)") : p_File
+	SplitPath(l_sSelectedFilePath, &l_sSelectedFileName, &l_sSelectedDir)
 
-	if (l_sGameExe ~= "i)\A(maxpayne.exe|maxpayne2.exe)\z")
+	if (l_sSelectedFileName ~= "i)\A(maxpayne.exe|maxpayne2.exe)\z")
 	{
-		global g_sGameDir := g_editGameDir.Text := l_sGameDir "\"
+		global g_sGameDir := g_editGameDir.Text := l_sSelectedDir "\"
 
 		; Change the game
-		global g_bMaxPayne2 := g_radioMP2.Value := l_sGameExe = "MaxPayne2.exe"
+		global g_bMaxPayne2 := g_radioMP2.Value := l_sSelectedFileName = "MaxPayne2.exe" ; case-insensitive
 		UpdateGame()
 
 		; Refresh the mod list
@@ -230,7 +235,7 @@ GuiCreateGeneral()
 	g_radioMP1 := g_gui.AddRadio("x" l_iMiddleX " y" l_iTopY + l_iCurrentRow * l_iSpacingY, "Max Payne")
 	g_radioMP2 := g_gui.AddRadio("Checked" g_bMaxPayne2 " x" l_iMiddleX + 100 " y" l_iTopY + l_iCurrentRow * l_iSpacingY, "Max Payne 2")
 	g_gui.AddButton("Background1F1F1F Default x" l_iRightX " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY - 7 " w" l_iRightWidth, "&Browse").OnEvent("Click",
-	                GuiButtonBrowse_Click)
+	                (*) => GuiButtonBrowse_Click())
 
 	g_gui.AddText("Right x" l_iLeftX " y" l_iTopY + l_iCurrentRow * l_iSpacingY + 5 " w" l_iLeftWidth, "Game directory")
 	g_editGameDir := g_gui.AddEdit("CBlack R1 ReadOnly x" l_iMiddleX " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY " w" l_iMiddleWidth + l_iRightWidth + l_iSpacingX - 2,
@@ -281,6 +286,7 @@ GuiCreateGeneral()
 	g_gui.AddButton("Background1F1F1F Default x223 w" l_iRightWidth, "&Start game").OnEvent("Click", GuiButtonStart_Click)
 
 	; Events
+	g_gui.OnEvent(            "DropFiles", Gui_DropFiles)
 	g_cbDeveloper.OnEvent(        "Click", GuiCB_Click)
 	g_cbDeveloperKeys.OnEvent(    "Click", GuiCB_Click)
 	g_cbShowprogress.OnEvent(     "Click", GuiCB_Click)
