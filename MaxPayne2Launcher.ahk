@@ -244,8 +244,11 @@ GuiCreateGeneral()
 	g_ddlResolution := g_gui.AddDropDownList(" x" l_iMiddleX " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY " w" l_iMiddleWidth, l_arrResolutions)
 	try g_ddlResolution.Text := g_sResolution
 	catch
+	{
 		; Resolution not found, default to the highest available
 		g_ddlResolution.Choose(l_arrResolutions.Length)
+		g_sResolution := g_ddlResolution.Text
+	}
 
 	; Launch parameters
 	l_iTopY += l_iSpacingY
