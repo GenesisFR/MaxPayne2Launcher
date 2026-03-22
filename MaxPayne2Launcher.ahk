@@ -193,6 +193,8 @@ GuiCB_Click(GuiCtrlObj, Info)
 			global g_bUnlockAllChapters := g_cbUnlockAllChapters.Value
 		case g_cbUnlockAllDiff:
 			global g_bUnlockAllDiff := g_cbUnlockAllDiff.Value
+		case g_cbEnableXbox:
+			try FileMove(g_cbEnableXbox.Value ? (g_sXboxAsiFile ".off") : g_sXboxAsiFile, g_cbEnableXbox.Value ? g_sXboxAsiFile : (g_sXboxAsiFile ".off"))
 	}
 }
 
@@ -348,9 +350,10 @@ GuiCreateWidescreen()
 
 	; Xbox rain droplets settings
 	l_iTopY += l_iSpacingY + 27
-	g_gbXbox := g_gui.AddGroupBox("h" l_iSpacingY * 8.7 " x" l_iLeftX - 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY - 5
+	g_gbXbox := g_gui.AddGroupBox("h" l_iSpacingY * 9.7 " x" l_iLeftX - 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY - 5
 	                              " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4 + 15, "Xbox rain droplets")
 
+	g_cbEnableXbox := g_gui.AddCheckbox("x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "Enable Xbox rain droplets")
 	g_cbEnableGravity := g_gui.AddCheckbox("Checked" g_bEnableGravity " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "Enable gravity")
 
 	g_textMinSize := g_gui.AddText("vSliderMinSizeLeft", "Mininum size")
@@ -384,17 +387,17 @@ GuiCreateWidescreen()
 	                                         " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iMiddleWidth + 15, g_fSpeedAdjuster * 10)
 
 	; Events
-	g_sliderFOVFactor.OnEvent("Change", (*) => g_editFOVFactor.Text := Round(g_sliderFOVFactor.Value / 10.0, 1))
-	g_hkGraphicNovelModeKey.OnEvent("Change", GuiHK_Change)
-	g_ddlGraphicNovelModeKey.OnEvent("Change", GuiDDL_Change)
-
+	g_sliderFOVFactor.OnEvent(          "Change", (*) => g_editFOVFactor.Text := Round(g_sliderFOVFactor.Value / 10.0, 1))
+	g_hkGraphicNovelModeKey.OnEvent(    "Change", GuiHK_Change)
+	g_ddlGraphicNovelModeKey.OnEvent(   "Change", GuiDDL_Change)
 	g_sliderWidescreenHudOffset.OnEvent("Change", (*) => g_editWidescreenHudOffset.Text := Float(g_sliderWidescreenHudOffset.Value))
-	g_sliderMinSize.OnEvent("Change", (*) => g_editMinSize.Text := g_sliderMinSize.Value)
-	g_sliderMaxSize.OnEvent("Change", (*) => g_editMaxSize.Text := g_sliderMaxSize.Value)
-	g_sliderMaxDrops.OnEvent("Change", (*) => g_editMaxDrops.Text := g_sliderMaxDrops.Value)
-	g_sliderMaxMovingDrops.OnEvent("Change", (*) => g_editMaxMovingDrops.Text := g_sliderMaxMovingDrops.Value)
-	g_sliderMoveStep.OnEvent("Change", (*) => g_editMoveStep.Text := Round(g_sliderMoveStep.Value / 10.0, 1))
-	g_sliderSpeedAdjuster.OnEvent("Change", (*) => g_editSpeedAdjuster.Text := Round(g_sliderSpeedAdjuster.Value / 10.0, 1))
+	g_cbEnableXbox.OnEvent(              "Click", GuiCB_Click)
+	g_sliderMinSize.OnEvent(            "Change", (*) => g_editMinSize.Text := g_sliderMinSize.Value)
+	g_sliderMaxSize.OnEvent(            "Change", (*) => g_editMaxSize.Text := g_sliderMaxSize.Value)
+	g_sliderMaxDrops.OnEvent(           "Change", (*) => g_editMaxDrops.Text := g_sliderMaxDrops.Value)
+	g_sliderMaxMovingDrops.OnEvent(     "Change", (*) => g_editMaxMovingDrops.Text := g_sliderMaxMovingDrops.Value)
+	g_sliderMoveStep.OnEvent(           "Change", (*) => g_editMoveStep.Text := Round(g_sliderMoveStep.Value / 10.0, 1))
+	g_sliderSpeedAdjuster.OnEvent(      "Change", (*) => g_editSpeedAdjuster.Text := Round(g_sliderSpeedAdjuster.Value / 10.0, 1))
 }
 
 GuiDDL_Change(GuiCtrlObj, Info)
@@ -466,22 +469,23 @@ GuiTab_Change(*)
 	; Toggle Xbox rain droplets controls visibility
 	if (g_tabs.Text == "Widescreen")
 	{
-		l_bXboxCfgFileExists := FileExist(g_sXboxCfgFile)
+		l_bXboxAsiFileExists := FileExist(g_sXboxAsiFile) || FileExist(g_sXboxAsiFile ".off")
 		l_arrControlsXbox := [
-			g_gbXbox, g_cbEnableGravity,
+			g_gbXbox, g_cbEnableXbox, g_cbEnableGravity,
 			g_editMaxDrops, g_editMaxMovingDrops, g_editMaxSize, g_editMinSize, g_editMoveStep, g_editSpeedAdjuster,
 			g_sliderMinSize, g_sliderMaxDrops, g_sliderMaxMovingDrops, g_sliderMaxSize, g_sliderMoveStep, g_sliderSpeedAdjuster,
 			g_textMaxDrops, g_textMaxMovingDrops, g_textMaxSize, g_textMinSize, g_textMoveStep, g_textSpeedAdjuster
 		]
 
 		for l_ctrl in l_arrControlsXbox
-			l_ctrl.Visible := l_bXboxCfgFileExists
+			l_ctrl.Visible := l_bXboxAsiFileExists
 	}
 }
 
 GuiUpdateWidescreen()
 {
 	global g_sWidescreenCfgFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".WidescreenFix.ini"
+	global g_sXboxAsiFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".XboxRainDroplets.asi"
 	global g_sXboxCfgFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".XboxRainDroplets.ini"
 
 	if (FileExist(g_sWidescreenCfgFile))
@@ -507,6 +511,7 @@ GuiUpdateWidescreen()
 		g_sliderWidescreenHudOffset.Value := g_editWidescreenHudOffset.Value := g_fWidescreenHudOffset
 
 		; Xbox
+		g_cbEnableXbox.Value := FileExist(g_sXboxAsiFile) != ""
 		g_cbEnableGravity.Value := g_bEnableGravity
 		g_sliderMinSize.Value := g_editMinSize.Text := g_iMinSize
 		g_sliderMaxDrops.Value := g_editMaxDrops.Text := g_iMaxDrops
@@ -629,6 +634,7 @@ ReadXboxRainDropletsConfigFile()
 {
 	global
 
+	g_sXboxAsiFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".XboxRainDroplets.asi"
 	g_sXboxCfgFile := g_sGameDir "scripts\MaxPayne" (g_bMaxPayne2 ? "2" : "") ".XboxRainDroplets.ini"
 
 	g_iMinSize        := IniRead(g_sXboxCfgFile, "MAIN", "MinSize", 4)
