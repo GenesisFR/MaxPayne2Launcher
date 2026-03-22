@@ -279,7 +279,7 @@ GuiCreateGeneral()
 	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + 5)
 
 	g_tabs.UseTab(0)
-	g_btnStart := g_gui.AddButton("Background1F1F1F Default x223 w" l_iRightWidth, "&Start game")
+	g_gui.AddButton("Background1F1F1F Default x223 w" l_iRightWidth, "&Start game").OnEvent("Click", GuiButtonStart_Click)
 
 	; Events
 	g_tabs.OnEvent("Change", GuiTab_Change)
@@ -292,7 +292,6 @@ GuiCreateGeneral()
 	g_cbUnlockAllChapters.OnEvent("Click", GuiCB_Click)
 	g_cbUnlockAllDiff.OnEvent(    "Click", GuiCB_Click)
 	g_ddlCustomGame.OnEvent(     "Change", GuiDDL_Change)
-	g_btnStart.OnEvent(           "Click", GuiButtonStart_Click)
 }
 
 GuiCreateWidescreen()
@@ -390,17 +389,17 @@ GuiCreateWidescreen()
 	                                         " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iMiddleWidth + 15, g_fSpeedAdjuster * 10)
 
 	; Events
-	g_sliderFOVFactor.OnEvent(          "Change", (*) => g_editFOVFactor.Text := Round(g_sliderFOVFactor.Value / 10.0, 1))
+	g_sliderFOVFactor.OnEvent(          "Change", GuiSlider_Change)
 	g_hkGraphicNovelModeKey.OnEvent(    "Change", GuiHK_Change)
 	g_ddlGraphicNovelModeKey.OnEvent(   "Change", GuiDDL_Change)
-	g_sliderWidescreenHudOffset.OnEvent("Change", (*) => g_editWidescreenHudOffset.Text := Float(g_sliderWidescreenHudOffset.Value))
+	g_sliderWidescreenHudOffset.OnEvent("Change", GuiSlider_Change)
 	g_cbEnableXbox.OnEvent(              "Click", GuiCB_Click)
-	g_sliderMinSize.OnEvent(            "Change", (*) => g_editMinSize.Text := g_sliderMinSize.Value)
-	g_sliderMaxSize.OnEvent(            "Change", (*) => g_editMaxSize.Text := g_sliderMaxSize.Value)
-	g_sliderMaxDrops.OnEvent(           "Change", (*) => g_editMaxDrops.Text := g_sliderMaxDrops.Value)
-	g_sliderMaxMovingDrops.OnEvent(     "Change", (*) => g_editMaxMovingDrops.Text := g_sliderMaxMovingDrops.Value)
-	g_sliderMoveStep.OnEvent(           "Change", (*) => g_editMoveStep.Text := Round(g_sliderMoveStep.Value / 10.0, 1))
-	g_sliderSpeedAdjuster.OnEvent(      "Change", (*) => g_editSpeedAdjuster.Text := Round(g_sliderSpeedAdjuster.Value / 10.0, 1))
+	g_sliderMinSize.OnEvent(            "Change", GuiSlider_Change)
+	g_sliderMaxSize.OnEvent(            "Change", GuiSlider_Change)
+	g_sliderMaxDrops.OnEvent(           "Change", GuiSlider_Change)
+	g_sliderMaxMovingDrops.OnEvent(     "Change", GuiSlider_Change)
+	g_sliderMoveStep.OnEvent(           "Change", GuiSlider_Change)
+	g_sliderSpeedAdjuster.OnEvent(      "Change", GuiSlider_Change)
 }
 
 GuiDDL_Change(GuiCtrlObj, Info)
@@ -465,6 +464,29 @@ GuiRadio_Click(GuiCtrlObj, Info)
 	ReadWidescreenFixConfigFile()
 	ReadXboxRainDropletsConfigFile()
 	GuiUpdateWidescreen()
+}
+
+GuiSlider_Change(GuiCtrlObj, Info)
+{
+	switch GuiCtrlObj
+	{
+		case g_sliderFOVFactor:
+			g_editFOVFactor.Text := Round(g_sliderFOVFactor.Value / 10.0, 1)
+		case g_sliderWidescreenHudOffset:
+			g_editWidescreenHudOffset.Text := Float(g_sliderWidescreenHudOffset.Value)
+		case g_sliderMinSize:
+			g_editMinSize.Text := g_sliderMinSize.Value
+		case g_sliderMaxSize:
+			g_editMaxSize.Text := g_sliderMaxSize.Value
+		case g_sliderMaxDrops:
+			g_editMaxDrops.Text := g_sliderMaxDrops.Value
+		case g_sliderMaxMovingDrops:
+			g_editMaxMovingDrops.Text := g_sliderMaxMovingDrops.Value
+		case g_sliderMoveStep:
+			g_editMoveStep.Text := Round(g_sliderMoveStep.Value / 10.0, 1)
+		case g_sliderSpeedAdjuster:
+			g_editSpeedAdjuster.Text := Round(g_sliderSpeedAdjuster.Value / 10.0, 1)
+	}
 }
 
 GuiTab_Change(*)
