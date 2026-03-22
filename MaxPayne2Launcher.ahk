@@ -82,6 +82,11 @@ GetResolutionList(p_iDisp := 1)
 	l_bufDevMode := Buffer(220, 0)
 	l_sRes := ""
 
+	; Safety check
+	p_iDisp := IsInteger(p_iDisp) ? p_iDisp : 1
+	if (p_iDisp < 1 || p_iDisp > MonitorGetCount())
+		p_iDisp := 1
+
 	; https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaysettingsw
 	while DllCall("EnumDisplaySettingsW", "WStr", "\\.\DISPLAY" p_iDisp, "UInt", A_Index - 1, "Ptr", l_bufDevMode.Ptr)
 	{
@@ -233,8 +238,12 @@ GuiCreateGeneral()
 	l_iTopY += l_iSpacingY - 3
 	g_gui.AddGroupBox("h" l_iSpacingY * 2.6 " x" l_iLeftX - 7 " y" l_iTopY + l_iSpacingY * l_iCurrentRow " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4, "Resolution")
 	g_gui.AddText("Right x" l_iLeftX " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY + 5 " w" l_iLeftWidth, "Choose your resolution")
-	g_ddlResolution := g_gui.AddDropDownList(" x" l_iMiddleX " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY " w" l_iMiddleWidth, GetResolutionList())
-	g_ddlResolution.Text := g_sResolution
+	local l_arrResolutions := GetResolutionList()
+	g_ddlResolution := g_gui.AddDropDownList(" x" l_iMiddleX " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY " w" l_iMiddleWidth, l_arrResolutions)
+	try g_ddlResolution.Text := g_sResolution
+	catch
+		; Resolution not found, default to the highest available
+		g_ddlResolution.Choose(l_arrResolutions.Length)
 
 	; Launch parameters
 	l_iTopY += l_iSpacingY
