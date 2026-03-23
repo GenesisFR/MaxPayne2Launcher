@@ -137,6 +137,54 @@ GuiButtonBrowse_Click(p_bUseFileSelect := true, p_File := "")
 	}
 }
 
+GuiButtonGeneralHelp_Click(*)
+{
+	MsgBox("
+	(
+		-developer: enables developer mode, including console (toggled with ~). Mostly useful for mod developers.
+
+		-developerkeys: enables special developer keys (requires -developer as well). Using developer keys can break the game flow.
+
+		-disable3dpreloads: if the system runs out of texture memory while loading a level, this option may prevent the game from crashing due to a driver error.
+
+		-nodialog: skips the Max Payne startup dialog when loading the game (uses options previously set).
+
+		-novidmemcheck: disables the video memory check at the start of the game.
+
+		-profile: enables the in-game profiler. Toggle profile with F11 and see console aliases for profiling options.
+
+		-screenshot: enables F10 for taking screenshots. Screenshots are saved to the "screenshots" folder under the Max Payne installation folder.
+
+		-showprogress: shows extended loading information. -developer is required.
+
+		-skipstartup: skips the startup video.
+
+		-window: runs the game in windowed mode, in the resolution selected from the Max Payne startup dialog. Not all 3D accelerators support running in a windowed mode.
+	)", "Launch parameters", "64 Owner" g_gui.Hwnd)
+}
+
+GuiButtonGeneralWidescreen_Click(*)
+{
+	MsgBox("
+	(
+		Cutscene borders: makes borders' size depend on aspect ratio.
+
+		D3D hook borders: adds additional borders during loadscreens and scope overlays.
+
+		FOV factor: makes FOV higher or lower. 1.0 by default.
+
+		Graphic novel mode key: key to switch between fullscreen and original graphic novels display. By default VK_F2. Use keyboard to navigate through pages.
+
+		Load save slot: skips menu and loads selected save game.
+
+		Use game folder for savegames: makes the game store saves inside 'savegames' directory in root folder.
+
+		Widescreen HUD: makes selected hud elements offset to screen edges.
+
+		Widescreen HUD offset: this is the default offset for 16:9. For lower aspect ratios adjusted automatically, for higher you may change it manually.
+	)", "Launch parameters", "64 Owner" g_gui.Hwnd)
+}
+
 GuiButtonStart_Click(*)
 {
 	g_gui.Hide()
@@ -158,7 +206,7 @@ GuiButtonStart_Click(*)
 	{
 		if (!FindGameExe())
 		{
-			MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Error", 16)
+			MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Error", "16 Owner" g_gui.Hwnd)
 			return
 		}
 
@@ -243,9 +291,11 @@ GuiCreateGeneral()
 
 	; Resolution
 	l_iTopY += l_iSpacingY - 3
-	g_gui.AddGroupBox("h" l_iSpacingY * 2.6 " x" l_iLeftX - 7 " y" l_iTopY + l_iSpacingY * l_iCurrentRow++ " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4, "Resolution")
+	g_gui.AddGroupBox("h" l_iSpacingY * 2.6 " x" l_iLeftX - 7 " y" l_iTopY + l_iSpacingY * l_iCurrentRow++ " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4,
+	                  "Resolution")
 	local l_arrResolutions := GetResolutionList()
-	g_ddlResolution := g_gui.AddDropDownList(" x" l_iLeftX + 10 " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + 7, l_arrResolutions)
+	g_ddlResolution := g_gui.AddDropDownList(" x" l_iLeftX + 10 " y" l_iTopY + l_iCurrentRow++ * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + 7,
+	                                         l_arrResolutions)
 	try g_ddlResolution.Text := g_sResolution
 	catch
 	{
@@ -259,6 +309,7 @@ GuiCreateGeneral()
 	g_gui.AddGroupBox("h" l_iSpacingY * 12.1 " x" l_iLeftX - 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4,
 	                  "Launch parameters")
 	g_linkPCGW := g_gui.AddLink("x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "See this link for more details.")
+	g_gui.AddButton("Background1F1F1F x" l_iRightX " y" l_iTopY + l_iCurrentRow * l_iSpacingY - 7 " w" l_iRightWidth, "&Help").OnEvent("Click", GuiButtonGeneralHelp_Click)
 	g_cbDeveloper := g_gui.AddCheckbox("Checked" g_bDeveloper                 " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-developer")
 	g_cbDeveloperKeys := g_gui.AddCheckbox("Checked" g_bDeveloperKeys         " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-developerkeys")
 	g_cbDisable3dpreloads := g_gui.AddCheckbox("Checked" g_bDisable3dpreloads " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-disable3dpreloads")
@@ -272,7 +323,8 @@ GuiCreateGeneral()
 
 	; Extra
 	l_iTopY += l_iSpacingY + 12
-	g_gui.AddGroupBox("h" l_iSpacingY * 3.1 " x" l_iLeftX - 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4, "Extras")
+	g_gui.AddGroupBox("h" l_iSpacingY * 3.1 " x" l_iLeftX - 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4,
+	                  "Extras")
 	g_cbUnlockAllChapters := g_gui.AddCheckbox("x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "Unlock all chapters")
 	g_cbUnlockAllDiff := g_gui.AddCheckbox("x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "Unlock all difficulties")
 
@@ -329,6 +381,8 @@ GuiCreateWidescreen()
 
 	g_cbAllowAltTabbingWithoutPausing := g_gui.AddCheckbox("Checked" g_bAllowAltTabbingWithoutPausing " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY,
 	                                                       "Allow alt tabbing without pausing")
+	g_gui.AddButton("Background1F1F1F x" l_iRightX + 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY - 7 " w" l_iRightWidth, "&Help").OnEvent("Click",
+	                GuiButtonGeneralWidescreen_Click)
 	g_cbCutsceneBorders := g_gui.AddCheckbox("Checked" g_bCutsceneBorders - 1 " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "Cutscene borders")
 	g_cbD3DHookBorders := g_gui.AddCheckbox("Checked" g_bD3DHookBorders " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "D3D hook borders")
 	g_gui.AddText("vSliderFOVFactorLeft", "FOV factor")
@@ -422,9 +476,6 @@ GuiDDL_Change(GuiCtrlObj, Info)
 
 GuiHK_Change(GuiCtrlObj, Info)
 {
-	; Turn MsgBox into a modal
-	g_gui.Opt("+OwnDialogs")
-
 	l_sHotkey := GuiCtrlObj.Value
 	l_sHotkeyLength := StrLen(l_sHotkey)
 	l_bShift := InStr(GuiCtrlObj.Value, "+")
@@ -440,7 +491,7 @@ GuiHK_Change(GuiCtrlObj, Info)
 	else if (l_bShift || l_bControl || l_bAlt && l_sHotkeyLength > 1)
 	{
 		GuiCtrlObj.Value := ""
-		MsgBox("You can't use modified keys!", , 48)
+		MsgBox("You can't use modified keys!", , "48 Owner" g_gui.Hwnd)
 	}
 
 	g_ddlGraphicNovelModeKey.Choose(1)
@@ -730,7 +781,7 @@ SaveSettings()
 		}
 	}
 	catch as e
-		MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), , 48)
+		MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), , "48 Owner" g_gui.Hwnd)
 }
 
 SaveWidescreenFixSettings()
@@ -766,7 +817,7 @@ SaveWidescreenFixSettings()
 			         g_sWidescreenCfgFile, "MISC", "AllowAltTabbingWithoutPausing")
 		}
 		catch as e
-			MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), , 48)
+			MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), , "48 Owner" g_gui.Hwnd)
 	}
 }
 
@@ -785,7 +836,7 @@ SaveXboxRainDropletsSettings()
 			IniWrite(" " g_editMoveStep.Text, g_sXboxCfgFile,       "MAIN", "MoveStep")
 		}
 		catch as e
-			MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), , 48)
+			MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), , "48 Owner" g_gui.Hwnd)
 	}
 }
 
