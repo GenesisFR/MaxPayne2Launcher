@@ -2,9 +2,6 @@
 #SingleInstance force     ; Allow only a single instance of the script to run.
 #Warn                     ; Enable warnings to assist with detecting common errors.
 
-; Do not edit this
-g_sConfigFile := A_ScriptDir "\MaxPayne2Launcher.ini"
-
 Init()
 
 BuildLaunchArgs()
@@ -182,7 +179,7 @@ GuiButtonGeneralWidescreen_Click(*)
 		Widescreen HUD: makes selected hud elements offset to screen edges.
 
 		Widescreen HUD offset: this is the default offset for 16:9. For lower aspect ratios adjusted automatically, for higher you may change it manually.
-	)", "Launch parameters", "64 Owner" g_gui.Hwnd)
+	)", "Widescreen fix options", "64 Owner" g_gui.Hwnd)
 }
 
 GuiButtonStart_Click(*)
@@ -644,8 +641,10 @@ ReadConfigFile()
 {
 	global
 
+	g_sConfigFile := A_ScriptDir "\MaxPayne2Launcher.ini"
+
 	g_bMaxPayne2         := IniRead(g_sConfigFile, "General", "bMaxPayne2", true) == true
-	g_sGameDir           := IniRead(g_sConfigFile, "General", "sGameDir", "C:\Program Files\Steam\steamapps\common\Max Payne 2\")
+	g_sGameDir           := RTrim(IniRead(g_sConfigFile, "General", "sGameDir", "C:\Program Files\Steam\steamapps\common\Max Payne 2\"), "\") "\" ; add a \ if missing
 	g_iWidth             := IniRead(g_sConfigFile, "General", "iWidth", 2560)
 	g_iHeight            := IniRead(g_sConfigFile, "General", "iHeight", 1440)
 	g_sModName           := IniRead(g_sConfigFile, "General", "sModName", "")
