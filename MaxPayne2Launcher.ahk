@@ -19,6 +19,7 @@ BuildLaunchArgs()
 	)
 
 	l_sLaunchArgs := ""
+
 	for l_sKey, l_sValue in l_mapArgs
 	{
 		if (l_sValue)
@@ -61,7 +62,8 @@ FindGameExe()
 		return true
 	}
 
-	; Check from the registry
+	; Check in the install directory from the registry
+	l_sGameDir := ""
 	try l_sGameDir := RegRead("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App " (g_bMaxPayne2 ? "12150" : "12140"), "InstallLocation", "")
 
 	if (l_sGameDir && FileExist(l_sGameDir g_sGameExe))
@@ -104,7 +106,7 @@ GetResolutionList(p_iDisp := 1)
 	return StrSplit(l_sRes, '`n')
 }
 
-Gui_DropFiles(GuiObj, GuiCtrlObj, FileArray, X, Y)
+Gui_DropFiles(GuiObj, GuiCtrlObj, FileArray, *)
 {
 	GuiButtonBrowse_Click(false, FileArray[1])
 }
@@ -214,8 +216,13 @@ GuiButtonStart_Click(*)
 
 			; We give some time for the launcher to show up
 			; If it always hangs, you should consider using https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch
+			g_btnStart.Enabled := false
 			if (!WinWaitActive(g_sWinTitleLauncher, , 30.0))
+			{
+				g_btnStart.Enabled := true
+				MsgBox("It seems like the Max Payne launcher is hanging, please try again or terminate it in Task Manager if nothing happens.", "Max Payne Launcher", "48 Owner" g_gui.Hwnd)
 				return
+			}
 		}
 		catch
 		{
@@ -241,7 +248,7 @@ GuiButtonStart_Click(*)
 	g_gui.Hide()
 }
 
-GuiCB_Click(GuiCtrlObj, Info)
+GuiCB_Click(GuiCtrlObj, *)
 {
 	; Turn MsgBox into a modal
 	g_gui.Opt("+OwnDialogs")
@@ -350,10 +357,11 @@ GuiCreateGeneral()
 	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_iLeftX + 10 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + 7)
 
 	g_tabs.UseTab(0)
-	g_gui.AddButton("Background1F1F1F Default x223 w" l_iRightWidth, "&Start game").OnEvent("Click", GuiButtonStart_Click)
+	g_btnStart := g_gui.AddButton("Background1F1F1F Default x223 w" l_iRightWidth, "&Start game")
 
 	; Events
 	g_gui.OnEvent(            "DropFiles", Gui_DropFiles)
+	g_btnStart.OnEvent(           "Click", GuiButtonStart_Click)
 	g_cbDeveloper.OnEvent(        "Click", GuiCB_Click)
 	g_cbDeveloperKeys.OnEvent(    "Click", GuiCB_Click)
 	g_cbShowprogress.OnEvent(     "Click", GuiCB_Click)
@@ -475,7 +483,7 @@ GuiCreateWidescreen()
 	g_sliderWidescreenHudOffset.OnEvent("Change", GuiSlider_Change)
 }
 
-GuiDDL_Change(GuiCtrlObj, Info)
+GuiDDL_Change(GuiCtrlObj, *)
 {
 	switch GuiCtrlObj
 	{
@@ -488,7 +496,7 @@ GuiDDL_Change(GuiCtrlObj, Info)
 	}
 }
 
-GuiHK_Change(GuiCtrlObj, Info)
+GuiHK_Change(GuiCtrlObj, *)
 {
 	l_sHotkey := GuiCtrlObj.Value
 	l_sHotkeyLength := StrLen(l_sHotkey)
@@ -511,7 +519,7 @@ GuiHK_Change(GuiCtrlObj, Info)
 	g_ddlGraphicNovelModeKey.Choose(1)
 }
 
-GuiRadio_Click(GuiCtrlObj, Info)
+GuiRadio_Click(GuiCtrlObj, *)
 {
 	switch GuiCtrlObj
 	{
@@ -536,7 +544,7 @@ GuiRadio_Click(GuiCtrlObj, Info)
 	GuiUpdateWidescreen()
 }
 
-GuiSlider_Change(GuiCtrlObj, Info)
+GuiSlider_Change(GuiCtrlObj, *)
 {
 	switch GuiCtrlObj
 	{
