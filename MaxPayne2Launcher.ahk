@@ -184,11 +184,17 @@ GuiButtonHelpWidescreen_Click(*)
 
 GuiButtonStart_Click(*)
 {
-	g_gui.Hide()
-
-	SaveSettings()
-	SaveWidescreenFixSettings()
-	SaveXboxRainDropletsSettings()
+	try
+	{
+		SaveSettings()
+		SaveWidescreenFixSettings()
+		SaveXboxRainDropletsSettings()
+	}
+	catch as e
+	{
+		MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), "Max Payne Launcher", "48 Owner" g_gui.Hwnd)
+		return
+	}
 
 	; If the launcher/game is already running, activate it
 	if (WinExist(g_sWinTitleLauncher))
@@ -201,19 +207,21 @@ GuiButtonStart_Click(*)
 	; Otherwise start the launcher with arguments
 	else
 	{
-		if (!FindGameExe())
+		try
 		{
-			MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Error", "16 Owner" g_gui.Hwnd)
+			DetectHiddenWindows(g_cbNodialog.Value)
+			Run(g_sGameDir g_sGameExe " " BuildLaunchArgs(), , g_cbNodialog.Value ? "Hide" : "")
+
+			; We give some time for the launcher to show up
+			; If it always hangs, you should consider using https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch
+			if (!WinWaitActive(g_sWinTitleLauncher, , 30.0))
+				return
+		}
+		catch
+		{
+			MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Max Payne Launcher", "16 Owner" g_gui.Hwnd)
 			return
 		}
-
-		DetectHiddenWindows(g_cbNodialog.Value)
-		Run(g_sGameDir g_sGameExe " " BuildLaunchArgs(), , g_cbNodialog.Value ? "Hide" : "")
-
-		; We give 15 seconds for the launcher to show up
-		; If it always hangs, you should consider using https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch
-		if (!WinWaitActive(g_sWinTitleLauncher, , 15.0))
-			return
 	}
 
 	; Send the right keystrokes to the game launcher window
@@ -221,6 +229,8 @@ GuiButtonStart_Click(*)
 	ControlChooseString(g_sResolution " x 32", "ComboBox2", g_sWinTitleLauncher) ; ComboBox2 = Screen Mode DDL
 	ControlChooseString(g_sModName, "ComboBox4", g_sWinTitleLauncher) ; ComboBox4 = Choose Customized Game DDL
 	ControlSend("{Enter}", "Button1", g_sWinTitleLauncher) ; Button1 = Play button
+
+	g_gui.Hide()
 }
 
 GuiCB_Click(GuiCtrlObj, Info)
@@ -735,87 +745,77 @@ ReadXboxRainDropletsConfigFile()
 
 SaveSettings()
 {
-	try
+	l_arrResolution := StrSplit(g_sResolution, " x ")
+	global g_iWidth := l_arrResolution[1]
+	global g_iHeight := l_arrResolution[2]
+
+	; Write to the registry
+	RegWrite(g_iWidth,  "REG_DWORD", g_sGameRegKey "Video Settings", "Display Width")
+	RegWrite(g_iHeight, "REG_DWORD", g_sGameRegKey "Video Settings", "Display Height")
+	RegWrite(g_sModName,   "REG_SZ", g_sGameRegKey "Customized Game", "Customized Game")
+
+	if (g_bUnlockAllChapters)
+		RegWrite(g_bUnlockAllChapters, "REG_DWORD", g_sGameRegKey "Game Level", "LevelSelector")
+
+	if (g_bUnlockAllDiff)
 	{
-		l_arrResolution := StrSplit(g_sResolution, " x ")
-		global g_iWidth := l_arrResolution[1]
-		global g_iHeight := l_arrResolution[2]
-
-		; Write to the registry
-		RegWrite(g_iWidth,  "REG_DWORD", g_sGameRegKey "Video Settings", "Display Width")
-		RegWrite(g_iHeight, "REG_DWORD", g_sGameRegKey "Video Settings", "Display Height")
-		RegWrite(g_sModName,   "REG_SZ", g_sGameRegKey "Customized Game", "Customized Game")
-
-		if (g_bUnlockAllChapters)
-			RegWrite(g_bUnlockAllChapters, "REG_DWORD", g_sGameRegKey "Game Level", "LevelSelector")
-
-		if (g_bUnlockAllDiff)
-		{
-			RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "hell")
-			RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "nightmare")
-			RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "timedmode")
-		}
-
-		; Write to the config file
-		if (!g_bNoGUI)
-		{
-			IniWrite(g_radioMP2.Value, g_sConfigFile,            "General", "bMaxPayne2")
-			IniWrite(g_sGameDir, g_sConfigFile,                  "General", "sGameDir")
-			IniWrite(g_iWidth, g_sConfigFile,                    "General", "iWidth")
-			IniWrite(g_iHeight, g_sConfigFile,                   "General", "iHeight")
-			IniWrite(g_sModName, g_sConfigFile,                  "General", "sModName")
-			IniWrite(g_cbUnlockAllChapters.Value, g_sConfigFile, "General", "bUnlockAllChapters")
-			IniWrite(g_cbUnlockAllDiff.Value, g_sConfigFile,     "General", "bUnlockAllDiff")
-			IniWrite(g_cbDeveloper.Value, g_sConfigFile,         "General", "bDeveloper")
-			IniWrite(g_cbDeveloperKeys.Value, g_sConfigFile,     "General", "bDeveloperKeys")
-			IniWrite(g_cbDisable3dpreloads.Value, g_sConfigFile, "General", "bDisable3dpreloads")
-			IniWrite(g_cbNodialog.Value, g_sConfigFile,          "General", "bNodialog")
-			IniWrite(g_cbNovidmemcheck.Value, g_sConfigFile,     "General", "bNovidmemcheck")
-			IniWrite(g_cbProfile.Value, g_sConfigFile,           "General", "bProfile")
-			IniWrite(g_cbScreenshot.Value, g_sConfigFile,        "General", "bScreenshot")
-			IniWrite(g_cbShowprogress.Value, g_sConfigFile,      "General", "bShowprogress")
-			IniWrite(g_cbSkipstartup.Value, g_sConfigFile,       "General", "bSkipstartup")
-			IniWrite(g_cbWindow.Value, g_sConfigFile,            "General", "bWindow")
-		}
+		RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "hell")
+		RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "nightmare")
+		RegWrite(g_bUnlockAllDiff, "REG_DWORD", g_sGameRegKey "Game Level", "timedmode")
 	}
-	catch as e
-		MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), , "48 Owner" g_gui.Hwnd)
+
+	; Write to the config file
+	if (!g_bNoGUI)
+	{
+		IniWrite(g_radioMP2.Value, g_sConfigFile,            "General", "bMaxPayne2")
+		IniWrite(g_sGameDir, g_sConfigFile,                  "General", "sGameDir")
+		IniWrite(g_iWidth, g_sConfigFile,                    "General", "iWidth")
+		IniWrite(g_iHeight, g_sConfigFile,                   "General", "iHeight")
+		IniWrite(g_sModName, g_sConfigFile,                  "General", "sModName")
+		IniWrite(g_cbUnlockAllChapters.Value, g_sConfigFile, "General", "bUnlockAllChapters")
+		IniWrite(g_cbUnlockAllDiff.Value, g_sConfigFile,     "General", "bUnlockAllDiff")
+		IniWrite(g_cbDeveloper.Value, g_sConfigFile,         "General", "bDeveloper")
+		IniWrite(g_cbDeveloperKeys.Value, g_sConfigFile,     "General", "bDeveloperKeys")
+		IniWrite(g_cbDisable3dpreloads.Value, g_sConfigFile, "General", "bDisable3dpreloads")
+		IniWrite(g_cbNodialog.Value, g_sConfigFile,          "General", "bNodialog")
+		IniWrite(g_cbNovidmemcheck.Value, g_sConfigFile,     "General", "bNovidmemcheck")
+		IniWrite(g_cbProfile.Value, g_sConfigFile,           "General", "bProfile")
+		IniWrite(g_cbScreenshot.Value, g_sConfigFile,        "General", "bScreenshot")
+		IniWrite(g_cbShowprogress.Value, g_sConfigFile,      "General", "bShowprogress")
+		IniWrite(g_cbSkipstartup.Value, g_sConfigFile,       "General", "bSkipstartup")
+		IniWrite(g_cbWindow.Value, g_sConfigFile,            "General", "bWindow")
+	}
 }
 
 SaveWidescreenFixSettings()
 {
 	if (!g_bNoGUI && g_arrTabs.Length > 1 && FileExist(g_sWidescreenCfgFile))
 	{
-		try
-		{
-			; Convert the GraphicNovelMode key back to hexadecimal format
-			l_hkGraphicNovelModeKey := g_hkGraphicNovelModeKey.Value ? g_hkGraphicNovelModeKey.Value : "F2"
-			l_hkGraphicNovelModeKey := Format("0x{:X}", GetKeyVK(l_hkGraphicNovelModeKey))
+		; Convert the GraphicNovelMode key back to hexadecimal format
+		l_hkGraphicNovelModeKey := g_hkGraphicNovelModeKey.Value ? g_hkGraphicNovelModeKey.Value : "F2"
+		l_hkGraphicNovelModeKey := Format("0x{:X}", GetKeyVK(l_hkGraphicNovelModeKey))
 
-			; We need to add the comments we stored earlier
+		; We need to add the comments we stored earlier
 
-			; Main
-			IniWrite(" " g_cbWidescreenHud.Value (g_arrWidescreenHud.Length > 1 ? " //" g_arrWidescreenHud[2] : ""), g_sWidescreenCfgFile, "MAIN", "WidescreenHud")
-			IniWrite(" " g_editWidescreenHudOffset.Text (g_arrWidescreenHudOffset.Length > 1 ? " //" g_arrWidescreenHudOffset[2] : ""), g_sWidescreenCfgFile,
-			         "MAIN", "WidescreenHudOffset")
-			IniWrite(" " g_editFOVFactor.Text (g_arrFOVFactor.Length > 1 ? " //" g_arrFOVFactor[2] : ""), g_sWidescreenCfgFile, "MAIN", "FOVFactor")
-			IniWrite(" " g_cbGraphicNovelMode.Value (g_arrGraphicNovelMode.Length > 1 ? " //" g_arrGraphicNovelMode[2] : ""), g_sWidescreenCfgFile,
-			         "MAIN", "GraphicNovelMode")
-			IniWrite(" " l_hkGraphicNovelModeKey (g_arrGraphicNovelModeKey.Length > 1 ? " //" g_arrGraphicNovelModeKey[2] : ""), g_sWidescreenCfgFile,
-			         "MAIN", "GraphicNovelModeKey")
-			IniWrite(" " g_cbCutsceneBorders.Value + 1 (g_arrCutsceneBorders.Length > 1 ? " //" g_arrCutsceneBorders[2] : ""), g_sWidescreenCfgFile,
-			         "MAIN", "CutsceneBorders")
-			IniWrite(" " g_cbD3DHookBorders.Value (g_arrD3DHookBorders.Length > 1 ? " //" g_arrD3DHookBorders[2] : ""), g_sWidescreenCfgFile, "MAIN", "D3DHookBorders")
+		; Main
+		IniWrite(" " g_cbWidescreenHud.Value (g_arrWidescreenHud.Length > 1 ? " //" g_arrWidescreenHud[2] : ""), g_sWidescreenCfgFile, "MAIN", "WidescreenHud")
+		IniWrite(" " g_editWidescreenHudOffset.Text (g_arrWidescreenHudOffset.Length > 1 ? " //" g_arrWidescreenHudOffset[2] : ""), g_sWidescreenCfgFile,
+		         "MAIN", "WidescreenHudOffset")
+		IniWrite(" " g_editFOVFactor.Text (g_arrFOVFactor.Length > 1 ? " //" g_arrFOVFactor[2] : ""), g_sWidescreenCfgFile, "MAIN", "FOVFactor")
+		IniWrite(" " g_cbGraphicNovelMode.Value (g_arrGraphicNovelMode.Length > 1 ? " //" g_arrGraphicNovelMode[2] : ""), g_sWidescreenCfgFile,
+		         "MAIN", "GraphicNovelMode")
+		IniWrite(" " l_hkGraphicNovelModeKey (g_arrGraphicNovelModeKey.Length > 1 ? " //" g_arrGraphicNovelModeKey[2] : ""), g_sWidescreenCfgFile,
+		         "MAIN", "GraphicNovelModeKey")
+		IniWrite(" " g_cbCutsceneBorders.Value + 1 (g_arrCutsceneBorders.Length > 1 ? " //" g_arrCutsceneBorders[2] : ""), g_sWidescreenCfgFile,
+		         "MAIN", "CutsceneBorders")
+		IniWrite(" " g_cbD3DHookBorders.Value (g_arrD3DHookBorders.Length > 1 ? " //" g_arrD3DHookBorders[2] : ""), g_sWidescreenCfgFile, "MAIN", "D3DHookBorders")
 
-			; Misc
-			IniWrite(" " (-g_ddlLoadSaveSlot.Value) (g_arrLoadSaveSlot.Length > 1 ? " //" g_arrLoadSaveSlot[2] : ""), g_sWidescreenCfgFile, "MISC", "LoadSaveSlot")
-			IniWrite(" " g_cbUseGameFolderForSavegames.Value (g_arrUseGameFolderForSavegames.Length > 1 ? " //" g_arrUseGameFolderForSavegames[2] : ""),
-			         g_sWidescreenCfgFile, "MISC", "UseGameFolderForSavegames")
-			IniWrite(" " g_cbAllowAltTabbingWithoutPausing.Value (g_arrAllowAltTabbingWithoutPausing.Length > 1 ? " //" g_arrAllowAltTabbingWithoutPausing[2] : ""),
-			         g_sWidescreenCfgFile, "MISC", "AllowAltTabbingWithoutPausing")
-		}
-		catch as e
-			MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), , "48 Owner" g_gui.Hwnd)
+		; Misc
+		IniWrite(" " (-g_ddlLoadSaveSlot.Value) (g_arrLoadSaveSlot.Length > 1 ? " //" g_arrLoadSaveSlot[2] : ""), g_sWidescreenCfgFile, "MISC", "LoadSaveSlot")
+		IniWrite(" " g_cbUseGameFolderForSavegames.Value (g_arrUseGameFolderForSavegames.Length > 1 ? " //" g_arrUseGameFolderForSavegames[2] : ""),
+		         g_sWidescreenCfgFile, "MISC", "UseGameFolderForSavegames")
+		IniWrite(" " g_cbAllowAltTabbingWithoutPausing.Value (g_arrAllowAltTabbingWithoutPausing.Length > 1 ? " //" g_arrAllowAltTabbingWithoutPausing[2] : ""),
+		         g_sWidescreenCfgFile, "MISC", "AllowAltTabbingWithoutPausing")
 	}
 }
 
@@ -823,18 +823,13 @@ SaveXboxRainDropletsSettings()
 {
 	if (!g_bNoGUI && g_arrTabs.Length > 1 && FileExist(g_sXboxCfgFile))
 	{
-		try
-		{
-			IniWrite(" " g_editMinSize.Text, g_sXboxCfgFile,        "MAIN", "MinSize")
-			IniWrite(" " g_editMaxSize.Text, g_sXboxCfgFile,        "MAIN", "MaxSize")
-			IniWrite(" " g_editMaxDrops.Text, g_sXboxCfgFile,       "MAIN", "MaxDrops")
-			IniWrite(" " g_editMaxMovingDrops.Text, g_sXboxCfgFile, "MAIN", "MaxMovingDrops")
-			IniWrite(" " g_cbEnableGravity.Value, g_sXboxCfgFile,   "MAIN", "EnableGravity")
-			IniWrite(" " g_editSpeedAdjuster.Text, g_sXboxCfgFile,  "MAIN", "SpeedAdjuster")
-			IniWrite(" " g_editMoveStep.Text, g_sXboxCfgFile,       "MAIN", "MoveStep")
-		}
-		catch as e
-			MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), , "48 Owner" g_gui.Hwnd)
+		IniWrite(" " g_editMinSize.Text, g_sXboxCfgFile,        "MAIN", "MinSize")
+		IniWrite(" " g_editMaxSize.Text, g_sXboxCfgFile,        "MAIN", "MaxSize")
+		IniWrite(" " g_editMaxDrops.Text, g_sXboxCfgFile,       "MAIN", "MaxDrops")
+		IniWrite(" " g_editMaxMovingDrops.Text, g_sXboxCfgFile, "MAIN", "MaxMovingDrops")
+		IniWrite(" " g_cbEnableGravity.Value, g_sXboxCfgFile,   "MAIN", "EnableGravity")
+		IniWrite(" " g_editSpeedAdjuster.Text, g_sXboxCfgFile,  "MAIN", "SpeedAdjuster")
+		IniWrite(" " g_editMoveStep.Text, g_sXboxCfgFile,       "MAIN", "MoveStep")
 	}
 }
 
