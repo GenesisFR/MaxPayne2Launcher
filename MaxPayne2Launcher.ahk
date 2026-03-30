@@ -134,7 +134,7 @@ GuiButtonBrowse_Click(p_bUseFileSelect := true, p_File := "")
 	}
 }
 
-GuiButtonGeneralHelp_Click(*)
+GuiButtonHelpGeneral_Click(*)
 {
 	MsgBox("
 	(
@@ -160,7 +160,7 @@ GuiButtonGeneralHelp_Click(*)
 	)", "Launch parameters", "64 Owner" g_gui.Hwnd)
 }
 
-GuiButtonGeneralWidescreen_Click(*)
+GuiButtonHelpWidescreen_Click(*)
 {
 	MsgBox("
 	(
@@ -244,7 +244,7 @@ GuiCB_Click(GuiCtrlObj, Info)
 		case g_cbUnlockAllDiff:
 			global g_bUnlockAllDiff := g_cbUnlockAllDiff.Value
 		case g_cbEnableXbox:
-			try FileMove(g_cbEnableXbox.Value ? (g_sXboxAsiFile ".off") : g_sXboxAsiFile, g_cbEnableXbox.Value ? g_sXboxAsiFile : (g_sXboxAsiFile ".off"))
+			try (g_cbEnableXbox.Value) ? FileMove(g_sXboxAsiFile ".off", g_sXboxAsiFile) : FileMove(g_sXboxAsiFile, g_sXboxAsiFile ".off")
 	}
 }
 
@@ -306,7 +306,7 @@ GuiCreateGeneral()
 	g_gui.AddGroupBox("h" l_iSpacingY * 12.1 " x" l_iLeftX - 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + l_iSpacingX * 4,
 	                  "Launch parameters")
 	g_linkPCGW := g_gui.AddLink("x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "See this link for more details.")
-	g_gui.AddButton("Background1F1F1F x" l_iRightX " y" l_iTopY + l_iCurrentRow * l_iSpacingY - 7 " w" l_iRightWidth, "&Help").OnEvent("Click", GuiButtonGeneralHelp_Click)
+	g_gui.AddButton("Background1F1F1F x" l_iRightX " y" l_iTopY + l_iCurrentRow * l_iSpacingY - 7 " w" l_iRightWidth, "&Help").OnEvent("Click", GuiButtonHelpGeneral_Click)
 	g_cbDeveloper := g_gui.AddCheckbox("Checked" g_bDeveloper                 " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-developer")
 	g_cbDeveloperKeys := g_gui.AddCheckbox("Checked" g_bDeveloperKeys         " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-developerkeys")
 	g_cbDisable3dpreloads := g_gui.AddCheckbox("Checked" g_bDisable3dpreloads " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "-disable3dpreloads")
@@ -378,8 +378,7 @@ GuiCreateWidescreen()
 
 	g_cbAllowAltTabbingWithoutPausing := g_gui.AddCheckbox("Checked" g_bAllowAltTabbingWithoutPausing " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY,
 	                                                       "Allow alt tabbing without pausing")
-	g_gui.AddButton("Background1F1F1F x" l_iRightX + 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY - 7 " w" l_iRightWidth, "&Help").OnEvent("Click",
-	                GuiButtonGeneralWidescreen_Click)
+	g_gui.AddButton("Background1F1F1F x" l_iRightX + 7 " y" l_iTopY + l_iCurrentRow * l_iSpacingY - 7 " w" l_iRightWidth, "&Help").OnEvent("Click", GuiButtonHelpWidescreen_Click)
 	g_cbCutsceneBorders := g_gui.AddCheckbox("Checked" g_bCutsceneBorders - 1 " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "Cutscene borders")
 	g_cbD3DHookBorders := g_gui.AddCheckbox("Checked" g_bD3DHookBorders " x" l_iLeftX + 15 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY, "D3D hook borders")
 	g_gui.AddText("vSliderFOVFactorLeft", "FOV factor")
@@ -488,7 +487,7 @@ GuiHK_Change(GuiCtrlObj, Info)
 	else if (l_bShift || l_bControl || l_bAlt && l_sHotkeyLength > 1)
 	{
 		GuiCtrlObj.Value := ""
-		MsgBox("You can't use modified keys!", , "48 Owner" g_gui.Hwnd)
+		MsgBox("You can't use modified keys!", "Max Payne Launcher", "48 Owner" g_gui.Hwnd)
 	}
 
 	g_ddlGraphicNovelModeKey.Choose(1)
@@ -616,7 +615,7 @@ Init()
 	GuiCreateGeneral()
 	UpdateGame()
 	if (!FindGameExe())
-		MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Error", 16)
+		MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Max Payne Launcher", 48)
 	UpdateMods()
 
 	if (g_bNoGUI)
