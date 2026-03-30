@@ -225,10 +225,18 @@ GuiButtonStart_Click(*)
 	}
 
 	; Send the right keystrokes to the game launcher window
-	ControlSend("{End}", "ComboBox1", g_sWinTitleLauncher) ; ComboBox1 = Display Adapter DDL
-	ControlChooseString(g_sResolution " x 32", "ComboBox2", g_sWinTitleLauncher) ; ComboBox2 = Screen Mode DDL
-	ControlChooseString(g_sModName, "ComboBox4", g_sWinTitleLauncher) ; ComboBox4 = Choose Customized Game DDL
-	ControlSend("{Enter}", "Button1", g_sWinTitleLauncher) ; Button1 = Play button
+	try
+	{
+		ControlSend("{End}", "ComboBox1", g_sWinTitleLauncher) ; ComboBox1 = Display Adapter DDL
+		ControlChooseString(g_sResolution " x 32", "ComboBox2", g_sWinTitleLauncher) ; ComboBox2 = Screen Mode DDL
+		ControlChooseString(g_sModName, "ComboBox4", g_sWinTitleLauncher) ; ComboBox4 = Choose Customized Game DDL
+		ControlSend("{Enter}", "Button1", g_sWinTitleLauncher) ; Button1 = Play button
+	}
+	catch
+	{
+		MsgBox("Couldn't find the required controls, is that the original game launcher?", "Max Payne Launcher", "16 Owner" g_gui.Hwnd)
+		return
+	}
 
 	g_gui.Hide()
 }
