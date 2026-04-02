@@ -190,7 +190,7 @@ GuiButtonHelpWidescreen_Click(*)
 	)", "Widescreen fix options", "64 Owner" g_gui.Hwnd)
 }
 
-GuiButtonStart_Click(*)
+GuiButtonStart_Click(p_iTimeout := 20)
 {
 	g_gui.Hide()
 
@@ -224,9 +224,14 @@ GuiButtonStart_Click(*)
 
 			; We give some time for the launcher to show up
 			; If it always hangs, you should consider using https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch
-			if (!WinWaitActive(g_sWinTitleLauncher, , 20.0))
+			if (!WinWaitActive(g_sWinTitleLauncher, , p_iTimeout))
 			{
-				MsgBox("It seems like the Max Payne launcher is hanging, please try again or terminate it in Task Manager if nothing happens.", "Max Payne Launcher", "48 Owner" g_gui.Hwnd)
+				if (MsgBox("It seems like the game's launcher is hanging or the game didn't close properly. Would you like to terminate it and try again?", "Max Payne Launcher", "52 Owner" g_gui.Hwnd) == "Yes")
+				{
+					ProcessClose("MaxPayne" (g_bMaxPayne2 ? "2" : "") ".exe")
+					SetTimer(GuiButtonStart_Click.Bind(30), -2000)
+				}
+
 				return
 			}
 		}
@@ -361,7 +366,7 @@ GuiCreateGeneral()
 	g_ddlCustomGame := g_gui.AddDropDownList("Choose1 x" l_iLeftX + 10 " y" l_iTopY + ++l_iCurrentRow * l_iSpacingY " w" l_iLeftWidth + l_iMiddleWidth + l_iRightWidth + 7)
 
 	g_tabs.UseTab(0)
-	g_gui.AddButton("Background1F1F1F Default x223 w" l_iRightWidth, "&Start game").OnEvent("Click", GuiButtonStart_Click)
+	g_gui.AddButton("Background1F1F1F Default x223 w" l_iRightWidth, "&Start game").OnEvent("Click", (*) => GuiButtonStart_Click())
 
 	; Events
 	g_gui.OnEvent(            "DropFiles", Gui_DropFiles)
