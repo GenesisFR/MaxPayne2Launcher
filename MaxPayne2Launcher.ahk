@@ -138,28 +138,34 @@ GuiButtonBrowse_Click(p_bUseFileSelect := true, p_File := "")
 
 GuiButtonHelpGeneral_Click(*)
 {
-	MsgBox("
+	l_sFormattedText := "
 	(
-		-developer: enables developer mode, including console (toggled with ~). Mostly useful for mod developers.
+		-developer: enables developer mode, including console (toggled with {1}). Mostly useful for mod developers.
 
 		-developerkeys: enables special developer keys (requires -developer as well). Using developer keys can break the game flow.
 
 		-disable3dpreloads: if the system runs out of texture memory while loading a level, this option may prevent the game from crashing due to a driver error.
 
-		-nodialog: skips the Max Payne startup dialog when loading the game (uses options previously set).
+		-nodialog: skips the Max Payne {2}startup dialog when loading the game (uses options previously set).
 
 		-novidmemcheck: disables the video memory check at the start of the game.
 
 		-profile: enables the in-game profiler. Toggle profile with F11 and see console aliases for profiling options.
 
-		-screenshot: enables F10 for taking screenshots. Screenshots are saved to the "screenshots" folder under the Max Payne installation folder.
+		-screenshot: enables F10 for taking screenshots. Screenshots are saved to the "screenshots" folder under the Max Payne {3}installation folder.
 
 		-showprogress: shows extended loading information. -developer is required.
 
 		-skipstartup: skips the startup video.
 
 		-window: runs the game in windowed mode, in the resolution selected from the Max Payne startup dialog. Not all 3D accelerators support running in a windowed mode.
-	)", "Launch parameters", "64 Owner" g_gui.Hwnd)
+	)"
+
+	MsgBox(
+		g_bMaxPayne2 ? Format(l_sFormattedText, "~", "2 ", "2 ") : Format(l_sFormattedText, "F12", "", ""),
+		"Launch parameters",
+		"64 Owner" g_gui.Hwnd
+	)
 }
 
 GuiButtonHelpWidescreen_Click(*)
