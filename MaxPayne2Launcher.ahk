@@ -164,7 +164,7 @@ GuiButtonHelpGeneral_Click(*)
 	MsgBox(
 		g_bMaxPayne2 ? Format(l_sFormattedText, "~", "2 ", "2 ") : Format(l_sFormattedText, "F12", "", ""),
 		"Launch parameters",
-		"64 Owner" g_gui.Hwnd
+		"Iconi Owner" g_gui.Hwnd
 	)
 }
 
@@ -187,7 +187,7 @@ GuiButtonHelpWidescreen_Click(*)
 		Widescreen HUD: makes selected hud elements offset to screen edges.
 
 		Widescreen HUD offset: this is the default offset for 16:9. For lower aspect ratios adjusted automatically, for higher you may change it manually.
-	)", "Widescreen fix options", "64 Owner" g_gui.Hwnd)
+	)", "Widescreen fix options", "Iconi Owner" g_gui.Hwnd)
 }
 
 GuiButtonStart_Click(p_iTimeout := 20)
@@ -202,7 +202,7 @@ GuiButtonStart_Click(p_iTimeout := 20)
 	}
 	catch as e
 	{
-		MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), "Max Payne Launcher", "48 Owner" g_gui.Hwnd)
+		MsgBox(Format("{1}: {2}.`n`nFile:`t{3}`nLine:`t{4}`nWhat:`t{5}`nStack:`n{6}", type(e), e.Message, e.File, e.Line, e.What, e.Stack), "Max Payne Launcher", "Icon! Owner" g_gui.Hwnd)
 		return
 	}
 
@@ -226,7 +226,7 @@ GuiButtonStart_Click(p_iTimeout := 20)
 			; If it always hangs, you should consider using https://community.pcgamingwiki.com/files/file/838-max-payne-series-startup-hang-patch
 			if (!WinWaitActive(g_sWinTitleLauncher, , p_iTimeout))
 			{
-				if (MsgBox("It seems like the game's launcher is hanging or the game didn't close properly. Would you like to terminate it and try again?", "Max Payne Launcher", "52 Owner" g_gui.Hwnd) == "Yes")
+				if (MsgBox("It seems like the game's launcher is hanging or the game didn't close properly. Would you like to terminate it and try again?", "Max Payne Launcher", "Icon! YesNo Owner" g_gui.Hwnd) == "Yes")
 				{
 					ProcessClose("MaxPayne" (g_bMaxPayne2 ? "2" : "") ".exe")
 					SetTimer(GuiButtonStart_Click.Bind(30), -2000)
@@ -237,7 +237,7 @@ GuiButtonStart_Click(p_iTimeout := 20)
 		}
 		catch
 		{
-			MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Max Payne Launcher", "16 Owner" g_gui.Hwnd)
+			MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Max Payne Launcher", "Iconx Owner" g_gui.Hwnd)
 			return
 		}
 	}
@@ -252,7 +252,7 @@ GuiButtonStart_Click(p_iTimeout := 20)
 	}
 	catch
 	{
-		MsgBox("Couldn't find the required controls, is that the original game launcher?", "Max Payne Launcher", "16 Owner" g_gui.Hwnd)
+		MsgBox("Couldn't find the required controls, is that the original game launcher?", "Max Payne Launcher", "Iconx Owner" g_gui.Hwnd)
 		return
 	}
 }
@@ -521,7 +521,7 @@ GuiHK_Change(GuiCtrlObj, *)
 	else if (l_bShift || l_bControl || l_bAlt && l_sHotkeyLength > 1)
 	{
 		GuiCtrlObj.Value := ""
-		MsgBox("You can't use modified keys!", "Max Payne Launcher", "48 Owner" g_gui.Hwnd)
+		MsgBox("You can't use modified keys!", "Max Payne Launcher", "Icon! Owner" g_gui.Hwnd)
 	}
 
 	g_ddlGraphicNovelModeKey.Choose(1)
@@ -649,7 +649,7 @@ Init()
 	GuiCreateGeneral()
 	UpdateGame()
 	if (!FindGameExe())
-		MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Max Payne Launcher", 48)
+		MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Max Payne Launcher", "Icon!")
 	UpdateMods()
 
 	if (g_bNoGUI)
