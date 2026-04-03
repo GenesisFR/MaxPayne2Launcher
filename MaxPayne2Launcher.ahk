@@ -655,14 +655,16 @@ Init()
 	ReadConfigFile()
 	GuiCreateGeneral()
 	UpdateGame()
-	if (!FindGameExe())
-		MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Max Payne Launcher", "Icon!")
+	l_bIsGameExeFound := FindGameExe()
 	UpdateMods()
 
 	if (g_bNoGUI)
 		GuiButtonStart_Click()
 	else
 	{
+		if (!l_bIsGameExeFound)
+			MsgBox("File not found:`n`n" g_sGameDir g_sGameExe, "Max Payne Launcher", "Icon!")
+
 		ReadWidescreenFixConfigFile()
 		ReadXboxRainDropletsConfigFile()
 		GuiCreateWidescreen()
